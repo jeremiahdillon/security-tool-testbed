@@ -32,6 +32,14 @@ python3 scoring/score.py --self-test  # harness still works
 separate grep to keep in sync.)
 (Install the pre-commit hooks with `pre-commit install` to run the first two automatically.)
 
+## Keeping the CodeRabbit test clean
+
+A single PR that adds both a case (`cases/`) and its answer (`ground-truth/`) would let an LLM
+reviewer read the answer while reviewing the diff. For a clean CodeRabbit explainability test,
+introduce the case to reviewers via the `land-case-prs` workflow (it copies only the case, never
+`ground-truth/`), or commit the `ground-truth/` record in a separate PR. CI does not block a
+combined PR — this is a convention, not an enforced rule.
+
 ## Authoring supply-chain cases
 
 If the Socket MCP server is available, confirm each planted package name is recognized by

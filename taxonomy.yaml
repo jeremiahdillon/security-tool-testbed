@@ -82,6 +82,7 @@ types:
       gitleaks: ["*"]        # any rule id from a dedicated secret scanner counts
       github: ["*"]          # GitHub secret scanning (no adapter yet; see docs/tools/README.md)
       trufflehog: ["*"]
+      aikido: ["*"]          # Aikido secrets detection
 
   vulnerable-dependency:
     cwe: CWE-1395
@@ -90,12 +91,14 @@ types:
       socket: [known-vulnerability, cve]
       endor: [KNOWN_VULNERABILITY, REACHABLE_VULNERABILITY]
       dependabot: ["*"]
+      aikido: [sca, known-vulnerability, cve, outdated]
 
   malicious-dependency:
     cwe: CWE-506
     aliases:
       socket: [malware, install-scripts, typosquat, suspicious]
       endor: [MALICIOUS_PACKAGE, TYPOSQUAT]
+      aikido: [malware, malicious-package, typosquat]
 
   license-risk:
     cwe: null
@@ -103,15 +106,16 @@ types:
       sonar: ["license"]
       endor: [LICENSE_RISK, COPYLEFT]
       socket: [license]
+      aikido: [license, license-risk]
 
   iac-misconfig:
     cwe: CWE-732
     aliases:
       sonar: ["docker:*", "github-actions:*", "iac"]
-      # CodeQL Actions analysis only runs if 'actions' is added to the codeql.yml language
-      # matrix (it is not, by default). Left here for when that is enabled.
-      codeql: ["actions/*"]
+      # CodeQL is not configured to analyze IaC/GitHub Actions here; IaC cases are covered by
+      # Sonar, Endor, and Aikido. (No codeql alias on purpose.)
       endor: [IAC_MISCONFIG, CICD_MISCONFIG]
+      aikido: [iac, dockerfile, "cicd", misconfiguration]
 
   logic-bug:
     # Not a security class — used for CodeRabbit code-review scenarios (off-by-one, missing
@@ -119,3 +123,4 @@ types:
     cwe: null
     aliases:
       coderabbit: ["logic error", "bug", "off-by-one", "missing await", "unhandled error"]
+      gitar: ["logic error", "bug", "off-by-one", "missing await", "unhandled error"]

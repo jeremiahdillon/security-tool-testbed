@@ -10,5 +10,5 @@ planted:
     severity: high
     file: cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java
     line: 23
-    expected_tools: [sonar, codeql, endor]
+    expected_tools: [sonar, codeql, endor, aikido]
     detail: builder.parse of user XML without disabling DOCTYPE/external entities.

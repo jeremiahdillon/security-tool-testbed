@@ -12,5 +12,5 @@ planted:
     severity: medium
     file: cases/license/pom.xml
     line: 20
-    expected_tools: [endor, socket]
+    expected_tools: [endor, socket, aikido]
     detail: "GPLv2 dependency declared in an MIT project."

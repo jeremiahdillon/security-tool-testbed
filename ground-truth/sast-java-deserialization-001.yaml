@@ -10,5 +10,5 @@ planted:
     severity: high
     file: cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java
     line: 32
-    expected_tools: [sonar, codeql, endor]
+    expected_tools: [sonar, codeql, endor, aikido]
     detail: new ObjectInputStream(...).readObject() on attacker-controlled bytes.

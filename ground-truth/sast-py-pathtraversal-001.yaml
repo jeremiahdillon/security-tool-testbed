@@ -10,5 +10,5 @@ planted:
     severity: high
     file: cases/sast/python/reportsvc/app.py
     line: 19
-    expected_tools: [sonar, codeql, coderabbit, endor]
+    expected_tools: [sonar, codeql, coderabbit, endor, aikido]
     detail: send_file(os.path.join(REPORT_ROOT, name)) with attacker-controlled name.

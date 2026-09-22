@@ -10,5 +10,5 @@ planted:
     severity: medium
     file: cases/sast/python/reportsvc/app.py
     line: 27
-    expected_tools: [sonar, codeql, coderabbit, endor]
+    expected_tools: [sonar, codeql, coderabbit, endor, aikido]
     detail: hashlib.md5 used to hash passwords.

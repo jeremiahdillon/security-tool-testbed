@@ -13,5 +13,5 @@ planted:
     severity: high
     file: cases/sast/js/taskflow/routes/tasks.js
     line: 11
-    expected_tools: [sonar, codeql, coderabbit, endor]
+    expected_tools: [sonar, codeql, coderabbit, endor, aikido, gitar]
     detail: owner/status interpolated into the SELECT via string concatenation.

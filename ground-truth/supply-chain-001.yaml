@@ -9,6 +9,6 @@ notes: >
   have intelligence on. `cross-env` (line 7) is the legitimate package and should NOT be
   flagged — it is the control that distinguishes it from the `crossenv` typosquat on line 8.
 planted:
-  - {type: malicious-dependency, cwe: CWE-506, severity: critical, file: cases/supply-chain/package.json, line: 8,  expected_tools: [socket, endor], detail: "crossenv — typosquat of cross-env, known malware"}
-  - {type: malicious-dependency, cwe: CWE-506, severity: high,     file: cases/supply-chain/package.json, line: 9,  expected_tools: [socket, endor], detail: "loadsh — typosquat of lodash"}
-  - {type: malicious-dependency, cwe: CWE-506, severity: critical, file: cases/supply-chain/package.json, line: 10, expected_tools: [socket, endor], detail: "event-stream 3.3.6 — historically compromised release"}
+  - {type: malicious-dependency, cwe: CWE-506, severity: critical, file: cases/supply-chain/package.json, line: 8,  expected_tools: [socket, endor, aikido], detail: "crossenv — typosquat of cross-env, known malware"}
+  - {type: malicious-dependency, cwe: CWE-506, severity: high,     file: cases/supply-chain/package.json, line: 9,  expected_tools: [socket, endor, aikido], detail: "loadsh — typosquat of lodash"}
+  - {type: malicious-dependency, cwe: CWE-506, severity: critical, file: cases/supply-chain/package.json, line: 10, expected_tools: [socket, endor, aikido], detail: "event-stream 3.3.6 — historically compromised release"}

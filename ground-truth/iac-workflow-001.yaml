@@ -13,19 +13,19 @@ planted:
     severity: high
     file: cases/iac-ci/pr-build.yml
     line: 4
-    expected_tools: [sonar, endor]
+    expected_tools: [sonar, endor, aikido]
     detail: "pull_request_target trigger runs with secrets/write token."
   - type: iac-misconfig
     cwe: CWE-269
     severity: high
     file: cases/iac-ci/pr-build.yml
     line: 7
-    expected_tools: [sonar, endor]
+    expected_tools: [sonar, endor, aikido]
     detail: "permissions: write-all grants excessive token scope."
   - type: iac-misconfig
     cwe: CWE-829
     severity: high
     file: cases/iac-ci/pr-build.yml
     line: 15
-    expected_tools: [sonar, endor]
+    expected_tools: [sonar, endor, aikido]
     detail: "checks out untrusted PR head sha and then executes it."

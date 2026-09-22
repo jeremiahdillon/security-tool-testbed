@@ -10,5 +10,5 @@ planted:
     severity: high
     file: cases/sast/js/taskflow/routes/webhooks.js
     line: 10
-    expected_tools: [sonar, codeql, endor]
+    expected_tools: [sonar, codeql, endor, aikido, gitar]
     detail: client.get(target) where target is fully user-controlled.

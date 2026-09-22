@@ -10,12 +10,12 @@ planted:
     severity: medium
     file: cases/iac-ci/Dockerfile
     line: 1
-    expected_tools: [sonar, endor]
+    expected_tools: [sonar, endor, aikido]
     detail: "No USER directive — container runs as root."
   - type: iac-misconfig
     cwe: CWE-494
     severity: high
     file: cases/iac-ci/Dockerfile
     line: 7
-    expected_tools: [sonar, endor]
+    expected_tools: [sonar, endor, aikido]
     detail: "curl -sSL ... | bash — remote code fetched and executed unverified at build."

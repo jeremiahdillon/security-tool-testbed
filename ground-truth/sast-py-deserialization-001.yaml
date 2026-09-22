@@ -10,5 +10,5 @@ planted:
     severity: high
     file: cases/sast/python/reportsvc/app.py
     line: 37
-    expected_tools: [sonar, codeql, coderabbit, endor]
+    expected_tools: [sonar, codeql, coderabbit, endor, aikido]
     detail: pickle.loads(base64.b64decode(request.form["token"])).

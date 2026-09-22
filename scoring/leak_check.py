@@ -26,12 +26,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
-# Directories where planted (fake) secrets are expected and allowed.
-#  - cases/ and scoring/fixtures/ : the corpus + harness fixtures.
-#  - review-sandbox/ : transient copies of a case created by the land-case-prs workflow (only
-#    ever holds copies of cases/, and those PRs are never merged), so a sandbox PR for the
-#    secrets case does not fail this guard.
-ALLOWED_PREFIXES = ("cases/", "scoring/fixtures/", "review-sandbox/")
+# Directories where planted (fake) secrets are expected and allowed. Kept tight: only the
+# corpus and the harness fixtures. (Transient review-sandbox/ PRs created by land-case-prs skip
+# this workflow via paths-ignore in scoring.yml, so they don't need an allowlist entry — which
+# would otherwise be a place a real secret could hide.)
+ALLOWED_PREFIXES = ("cases/", "scoring/fixtures/")
 
 # High-signal provider credential patterns. Kept deliberately specific to avoid false alarms;
 # the goal is catching a real key committed to the wrong place, not exhaustive secret scanning

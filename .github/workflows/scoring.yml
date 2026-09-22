@@ -7,6 +7,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    # Transient review-sandbox PRs (from land-case-prs) only add review-sandbox/** copies of a
+    # case; skip the guards for those so they don't false-fail on the copied planted secrets.
+    paths-ignore:
+      - "review-sandbox/**"
   workflow_dispatch:
     inputs:
       round_dir:

@@ -12,5 +12,5 @@ planted:
     severity: medium
     file: cases/code-review/js/pagination.js
     line: 13
-    expected_tools: [coderabbit]
+    expected_tools: [coderabbit, gitar]
     detail: "loop should be i < items.length; trailing undefined element pushed."
