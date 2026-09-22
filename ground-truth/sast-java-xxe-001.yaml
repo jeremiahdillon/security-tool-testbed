@@ -1,0 +1,14 @@
+id: sast-java-xxe-001
+category: sast
+language: java
+title: XML external entity (XXE) in document parsing
+expected_summary: Parses an uploaded XML document and returns its root element name.
+notes: DocumentBuilderFactory is used with default features (external entities enabled).
+planted:
+  - type: xxe
+    cwe: CWE-611
+    severity: high
+    file: cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java
+    line: 23
+    expected_tools: [sonar, codeql, endor]
+    detail: builder.parse of user XML without disabling DOCTYPE/external entities.

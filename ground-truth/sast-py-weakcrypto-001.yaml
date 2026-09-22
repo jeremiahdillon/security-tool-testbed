@@ -1,0 +1,14 @@
+id: sast-py-weakcrypto-001
+category: sast
+language: python
+title: Weak password hashing with MD5
+expected_summary: Registers a user, storing a hash of their password.
+notes: Passwords are hashed with unsalted MD5 — unsuitable for credential storage.
+planted:
+  - type: weak-crypto
+    cwe: CWE-327
+    severity: medium
+    file: cases/sast/python/reportsvc/app.py
+    line: 27
+    expected_tools: [sonar, codeql, coderabbit, endor]
+    detail: hashlib.md5 used to hash passwords.

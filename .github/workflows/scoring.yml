@@ -1,0 +1,55 @@
+name: Scoring & guardrails
+
+# Runs the guardrail check, ground-truth validation, and harness self-test on every push/PR,
+# and can score a round on demand.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      round_dir:
+        description: "Round directory to score (e.g. results/2026-09-21). Leave blank to skip."
+        required: false
+        default: ""
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install harness deps
+        run: pip install -r scoring/requirements.txt
+
+      - name: Guardrail check (DO-NOT sync + no install artifacts)
+        run: python scoring/guardrail_check.py
+
+      - name: No giveaways in source
+        run: |
+          if grep -rniE 'vulnerab|insecure|injection|traversal|deserializ|CWE-|malicious|typosquat|xxe|ssrf' cases/; then
+            echo "::error::Tell-tale strings found in cases/ — answers belong in ground-truth/ only."
+            exit 1
+          fi
+
+      - name: Validate ground truth
+        run: python scoring/score.py --validate
+
+      - name: Harness self-test
+        run: python scoring/score.py --self-test
+
+      - name: Score round (optional)
+        if: ${{ github.event.inputs.round_dir != '' }}
+        run: python scoring/score.py --round "${{ github.event.inputs.round_dir }}"
+
+      - name: Upload round report
+        if: ${{ github.event.inputs.round_dir != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: round-report
+          path: ${{ github.event.inputs.round_dir }}/report.md

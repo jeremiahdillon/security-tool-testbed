@@ -1,0 +1,14 @@
+id: sast-py-deserialization-001
+category: sast
+language: python
+title: Insecure deserialization of session token
+expected_summary: Restores session state from a client-provided token.
+notes: A base64 client token is passed directly to pickle.loads — arbitrary code execution.
+planted:
+  - type: insecure-deserialization
+    cwe: CWE-502
+    severity: high
+    file: cases/sast/python/reportsvc/app.py
+    line: 37
+    expected_tools: [sonar, codeql, coderabbit, endor]
+    detail: pickle.loads(base64.b64decode(request.form["token"])).

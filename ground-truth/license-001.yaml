@@ -1,0 +1,16 @@
+id: license-001
+category: license
+language: java
+title: Copyleft (GPL) dependency in an MIT-licensed project
+expected_summary: Analytics connector module declaring its dependencies.
+notes: >
+  mysql-connector-java 8.0.30 is GPLv2 (with FOSS exception). Pulling it into an MIT project is
+  a license-compatibility risk that SCA/license tools should flag.
+planted:
+  - type: license-risk
+    cwe: null
+    severity: medium
+    file: cases/license/pom.xml
+    line: 20
+    expected_tools: [endor, socket, sonar]
+    detail: "GPLv2 dependency declared in an MIT project."

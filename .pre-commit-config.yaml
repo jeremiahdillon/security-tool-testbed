@@ -1,0 +1,19 @@
+# Pre-commit guardrails for the security testbed.
+# Install locally with:  pip install pre-commit && pre-commit install
+# These hooks are also run in CI (see .github/workflows/scoring.yml).
+repos:
+  - repo: local
+    hooks:
+      - id: guardrail-check
+        name: Guardrail check (DO-NOT sync + no install artifacts)
+        entry: python scoring/guardrail_check.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: ground-truth-validate
+        name: Validate ground-truth records against schema and source
+        entry: python scoring/score.py --validate
+        language: system
+        pass_filenames: false
+        always_run: true

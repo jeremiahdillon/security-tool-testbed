@@ -1,0 +1,30 @@
+# --- Install artifacts (MUST NOT be committed in this testbed) ---
+# The presence of any of these means someone installed dependencies, which is forbidden here.
+# The guardrail CI check also fails the build if these appear.
+node_modules/
+package-lock.json
+npm-shrinkwrap.json
+pnpm-lock.yaml
+yarn.lock
+.pnp.*
+poetry.lock
+Pipfile.lock
+.venv/
+venv/
+__pycache__/
+*.pyc
+target/          # Maven/Gradle build output
+build/
+.gradle/
+*.class
+
+# --- Local tooling / scratch ---
+.DS_Store
+*.log
+.idea/
+.vscode/
+scoring/.venv/
+
+# --- Round working inputs that shouldn't be versioned by default ---
+# (Committed results live under results/<date>/; raw tool dumps can be large.)
+results/**/raw/

@@ -1,0 +1,4 @@
+inputs:
+  - {format: sarif,  tool: codeql, path: codeql.sarif}
+  - {format: sonar,  tool: sonar,  path: sonar.json}
+  - {format: socket, tool: socket, path: socket.json}

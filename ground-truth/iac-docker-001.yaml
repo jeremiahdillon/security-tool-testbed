@@ -1,0 +1,21 @@
+id: iac-docker-001
+category: iac-ci
+language: none
+title: Insecure Dockerfile (root user, curl | bash bootstrap)
+expected_summary: Container image definition for the worker service.
+notes: Runs as root (no USER) and pipes a remote script straight into bash during build.
+planted:
+  - type: iac-misconfig
+    cwe: CWE-732
+    severity: medium
+    file: cases/iac-ci/Dockerfile
+    line: 1
+    expected_tools: [sonar, endor]
+    detail: "No USER directive — container runs as root."
+  - type: iac-misconfig
+    cwe: CWE-494
+    severity: high
+    file: cases/iac-ci/Dockerfile
+    line: 7
+    expected_tools: [sonar, endor]
+    detail: "curl -sSL ... | bash — remote code fetched and executed unverified at build."

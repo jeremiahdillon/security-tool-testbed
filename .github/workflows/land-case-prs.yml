@@ -1,0 +1,51 @@
+name: Land case PR
+
+# Opens a pull request that introduces a copy of a case as an ADDED diff, so PR-driven tools
+# (CodeRabbit, Socket) have something to react to. The copy lands under review-sandbox/ and the
+# PR is meant to be reviewed and then CLOSED (not merged) — it never mutates the canonical cases.
+on:
+  workflow_dispatch:
+    inputs:
+      case_path:
+        description: "Case dir or file to review, e.g. cases/sast/js/taskflow or cases/supply-chain"
+        required: true
+      note:
+        description: "Optional note added to the PR body"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create review branch with the case as an added diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CASE_PATH: ${{ github.event.inputs.case_path }}
+          NOTE: ${{ github.event.inputs.note }}
+        run: |
+          set -euo pipefail
+          if [ ! -e "$CASE_PATH" ]; then
+            echo "::error::case_path '$CASE_PATH' does not exist"; exit 1
+          fi
+          slug=$(echo "$CASE_PATH" | tr '/.' '--')
+          branch="review/${slug}-${GITHUB_RUN_ID}"
+          git config user.name "testbed-bot"
+          git config user.email "testbed-bot@users.noreply.github.com"
+          git checkout -b "$branch"
+          dest="review-sandbox/${slug}"
+          mkdir -p "$dest"
+          cp -r "$CASE_PATH" "$dest/"
+          git add review-sandbox
+          git commit -m "Review sandbox: introduce ${CASE_PATH} for tool review"
+          git push -u origin "$branch"
+          gh pr create \
+            --title "Review sandbox: ${CASE_PATH}" \
+            --body "$(printf 'Transient PR to trigger PR-driven tools (CodeRabbit, Socket) on \x60%s\x60.\n\n**Do not merge** — close after collecting tool output.\n\n%s' "$CASE_PATH" "$NOTE")" \
+            --head "$branch"

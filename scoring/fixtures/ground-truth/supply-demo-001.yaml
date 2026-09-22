@@ -1,0 +1,13 @@
+id: supply-demo-001
+category: supply-chain
+language: javascript
+title: Fixture — malicious/typosquat dependency reference
+notes: Fixture used by score.py --self-test. Not a real case.
+planted:
+  - type: malicious-dependency
+    cwe: CWE-506
+    severity: critical
+    file: cases/supply-chain/package.json
+    line: 6
+    expected_tools: [socket]
+    detail: Reference to a typosquat-style package name (never installed).

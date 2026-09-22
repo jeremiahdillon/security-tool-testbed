@@ -1,0 +1,27 @@
+# Schema (informal, human- and harness-readable) for a ground-truth record.
+# One file per case lives at ground-truth/<id>.yaml. The harness (`scoring/score.py --validate`)
+# enforces the required fields and that every planted `file`/`line` exists in the repo.
+
+# --- required top-level fields ---
+id: string            # unique, kebab-case, matches the ground-truth filename stem
+                      #   convention: <category>-<lang>-<short>-NNN  e.g. sast-js-sqli-001
+category: enum        # one of: sast | secrets | dependencies | supply-chain |
+                      #         code-review | license | iac-ci
+language: enum        # javascript | typescript | python | java | none
+title: string         # short human title (safe to be descriptive — this file is not in cases/)
+
+# --- optional ---
+expected_summary: string   # one line describing what the code LEGITIMATELY does; graded
+                           # against CodeRabbit's summary to score explainability.
+notes: string              # free text: why it's planted, nuances, references.
+
+# --- required: at least one planted finding ---
+planted:
+  - type: string           # canonical type key from taxonomy.yaml (e.g. sql-injection)
+    cwe: string|null        # CWE id, should match taxonomy.yaml for that type
+    severity: enum          # info | low | medium | high | critical
+    file: string            # repo-relative path that EXISTS under cases/ (validated)
+    line: integer           # 1-indexed line of the flaw (validated to be within the file)
+    expected_tools: [list]  # tool keys expected to catch this: sonar codeql coderabbit
+                            #   socket endor gitleaks dependabot ...
+    detail: string          # optional: one line on the specific sink/pattern

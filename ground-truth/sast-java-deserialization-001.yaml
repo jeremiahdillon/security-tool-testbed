@@ -1,0 +1,14 @@
+id: sast-java-deserialization-001
+category: sast
+language: java
+title: Insecure Java deserialization of client token
+expected_summary: Restores a previously exported document state from a client token.
+notes: A base64 client token is fed to ObjectInputStream.readObject — classic gadget-chain RCE.
+planted:
+  - type: insecure-deserialization
+    cwe: CWE-502
+    severity: high
+    file: cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java
+    line: 32
+    expected_tools: [sonar, codeql, endor]
+    detail: new ObjectInputStream(...).readObject() on attacker-controlled bytes.

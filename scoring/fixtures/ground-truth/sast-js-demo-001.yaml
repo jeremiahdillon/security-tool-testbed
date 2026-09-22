@@ -1,0 +1,14 @@
+id: sast-js-demo-001
+category: sast
+language: javascript
+title: Fixture — string-concatenated SQL query
+expected_summary: Returns task rows owned by the given owner id.
+notes: Fixture used by score.py --self-test. Not a real case.
+planted:
+  - type: sql-injection
+    cwe: CWE-89
+    severity: high
+    file: cases/sast/js/demo/app.js
+    line: 7
+    expected_tools: [codeql, sonar]
+    detail: req.query.owner interpolated into a SQL template literal.

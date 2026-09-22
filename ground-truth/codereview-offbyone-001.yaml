@@ -1,0 +1,16 @@
+id: codereview-offbyone-001
+category: code-review
+language: javascript
+title: Off-by-one in lastWindow pagination helper
+expected_summary: Returns the most recent pageSize items from a list.
+notes: >
+  The loop condition `i <= items.length` reads one past the end, pushing an undefined element.
+  A rule-based SAST tool is not expected to catch this; it targets CodeRabbit-style review.
+planted:
+  - type: logic-bug
+    cwe: null
+    severity: medium
+    file: cases/code-review/js/pagination.js
+    line: 13
+    expected_tools: [coderabbit]
+    detail: "loop should be i < items.length; trailing undefined element pushed."

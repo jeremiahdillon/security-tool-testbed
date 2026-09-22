@@ -1,0 +1,117 @@
+# Canonical taxonomy for the testbed.
+#
+# The scoring harness reads THIS file (not hard-coded logic) to reconcile the different names
+# that each tool uses for the same class of finding. To support a new finding type or a new
+# tool's naming, edit this file — no code change required.
+#
+# Each entry:
+#   key:        the canonical `type` used in ground-truth/*.yaml
+#   cwe:        the primary CWE id (used as a cross-tool matching key)
+#   aliases:    per-tool rule ids / rule names / categories that mean the same thing.
+#               Matching is case-insensitive and also matches on the shared CWE when present.
+#
+# `aliases` is intentionally permissive and additive: unknown-but-CWE-tagged findings still
+# match via the `cwe` field, so partial coverage is fine while onboarding a tool.
+
+types:
+  sql-injection:
+    cwe: CWE-89
+    aliases:
+      sonar: [javascript:S3649, python:S3649, java:S3649, "sql injection"]
+      codeql: [js/sql-injection, py/sql-injection, java/sql-injection]
+      coderabbit: ["sql injection"]
+      endor: [SQL_INJECTION]
+      socket: []
+
+  command-injection:
+    cwe: CWE-78
+    aliases:
+      sonar: [javascript:S2076, python:S2076, java:S2076, "os command injection"]
+      codeql: [js/command-line-injection, py/command-line-injection, java/command-line-injection]
+      coderabbit: ["command injection"]
+      endor: [COMMAND_INJECTION]
+
+  path-traversal:
+    cwe: CWE-22
+    aliases:
+      sonar: [javascript:S2083, python:S2083, java:S2083, "path traversal"]
+      codeql: [js/path-injection, py/path-injection, java/path-injection]
+      coderabbit: ["path traversal", "directory traversal"]
+      endor: [PATH_TRAVERSAL]
+
+  ssrf:
+    cwe: CWE-918
+    aliases:
+      sonar: [javascript:S5144, python:S5144, java:S5144, "server-side request forgery"]
+      codeql: [js/request-forgery, py/full-ssrf, java/ssrf]
+      coderabbit: ["ssrf", "server-side request forgery"]
+      endor: [SSRF]
+
+  weak-crypto:
+    cwe: CWE-327
+    aliases:
+      sonar: [javascript:S4790, python:S4790, java:S4790, "weak hashing", "md5"]
+      codeql: [js/weak-cryptographic-algorithm, py/weak-sensitive-data-hashing, java/weak-cryptographic-algorithm]
+      coderabbit: ["weak hash", "md5", "insecure algorithm"]
+      endor: [WEAK_HASH, WEAK_CRYPTO]
+
+  insecure-deserialization:
+    cwe: CWE-502
+    aliases:
+      sonar: [python:S5135, java:S5135, "insecure deserialization"]
+      codeql: [py/unsafe-deserialization, java/unsafe-deserialization]
+      coderabbit: ["insecure deserialization", "pickle", "unsafe deserialization"]
+      endor: [INSECURE_DESERIALIZATION]
+
+  xxe:
+    cwe: CWE-611
+    aliases:
+      sonar: [java:S2755, "xml external entity"]
+      codeql: [java/xxe, py/xxe]
+      coderabbit: ["xxe", "xml external entity"]
+      endor: [XXE]
+
+  hardcoded-secret:
+    cwe: CWE-798
+    aliases:
+      sonar: ["secrets:*", "hardcoded credentials"]
+      codeql: [js/hardcoded-credentials, py/hardcoded-credentials]
+      coderabbit: ["hardcoded secret", "hardcoded credential", "exposed secret"]
+      endor: [SECRET, HARDCODED_SECRET]
+      socket: []
+      gitleaks: ["*"]        # any rule id from a dedicated secret scanner counts
+
+  vulnerable-dependency:
+    cwe: CWE-1395
+    aliases:
+      sonar: ["dependency vulnerability"]
+      socket: [known-vulnerability, cve]
+      endor: [KNOWN_VULNERABILITY, REACHABLE_VULNERABILITY]
+      dependabot: ["*"]
+
+  malicious-dependency:
+    cwe: CWE-506
+    aliases:
+      socket: [malware, install-scripts, typosquat, suspicious]
+      endor: [MALICIOUS_PACKAGE, TYPOSQUAT]
+
+  license-risk:
+    cwe: null
+    aliases:
+      sonar: ["license"]
+      endor: [LICENSE_RISK, COPYLEFT]
+      socket: [license]
+
+  iac-misconfig:
+    cwe: CWE-732
+    aliases:
+      sonar: ["docker:*", "github-actions:*", "iac"]
+      codeql: [actions/*]
+      endor: [IAC_MISCONFIG, CICD_MISCONFIG]
+
+  logic-bug:
+    # Not a security class — used for CodeRabbit code-review scenarios (off-by-one, missing
+    # await, swallowed errors). Rule-based SAST tools are not expected to catch these.
+    cwe: null
+    aliases:
+      coderabbit: ["logic error", "bug", "off-by-one", "missing await", "unhandled error"]

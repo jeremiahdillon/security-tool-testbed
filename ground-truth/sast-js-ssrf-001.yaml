@@ -1,0 +1,14 @@
+id: sast-js-ssrf-001
+category: sast
+language: javascript
+title: SSRF in webhook verification
+expected_summary: Pings a user-supplied webhook URL to confirm the endpoint is reachable.
+notes: req.body.url is fetched server-side with no allowlist or internal-address filtering.
+planted:
+  - type: ssrf
+    cwe: CWE-918
+    severity: high
+    file: cases/sast/js/taskflow/routes/webhooks.js
+    line: 10
+    expected_tools: [sonar, codeql, endor]
+    detail: client.get(target) where target is fully user-controlled.

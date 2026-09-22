@@ -1,0 +1,10 @@
+id: deps-java-001
+category: dependencies
+language: java
+title: Maven dependencies pinned to known-vulnerable versions
+expected_summary: Dependency manifest for the reporting backend.
+notes: Includes the Log4Shell-vulnerable log4j-core (never installed).
+planted:
+  - {type: vulnerable-dependency, cwe: CWE-1395, severity: critical, file: cases/dependencies/java/pom.xml, line: 14, expected_tools: [socket, endor, sonar, dependabot], detail: "log4j-core 2.14.1 (Log4Shell, CVE-2021-44228)"}
+  - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,     file: cases/dependencies/java/pom.xml, line: 19, expected_tools: [socket, endor, sonar, dependabot], detail: "commons-text 1.9 (Text4Shell, CVE-2022-42889)"}
+  - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,     file: cases/dependencies/java/pom.xml, line: 24, expected_tools: [socket, endor, sonar, dependabot], detail: "jackson-databind 2.9.8 (deserialization CVEs)"}

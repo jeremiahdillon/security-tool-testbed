@@ -1,0 +1,17 @@
+id: sast-js-sqli-001
+category: sast
+language: javascript
+title: SQL injection via concatenated task query
+expected_summary: Lists tasks for a given owner, optionally filtered by status.
+notes: >
+  req.query.owner and req.query.status are concatenated straight into a SQL string. The
+  sibling GET /tasks/:id handler is safe (parameterized) — a good discriminator for whether a
+  tool flags the right line.
+planted:
+  - type: sql-injection
+    cwe: CWE-89
+    severity: high
+    file: cases/sast/js/taskflow/routes/tasks.js
+    line: 11
+    expected_tools: [sonar, codeql, coderabbit, endor]
+    detail: owner/status interpolated into the SELECT via string concatenation.

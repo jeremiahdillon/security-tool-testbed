@@ -1,0 +1,71 @@
+# Architecture & design decisions
+
+Short ADR-style records of *why* the repo is shaped the way it is, so the decisions aren't
+relitigated by a future contributor (human or agent).
+
+## ADR-1: Ground truth lives outside the source tree
+
+**Decision.** All answers live in `ground-truth/<id>.yaml`, never beside the code in `cases/`.
+
+**Why.** Rule-based tools (Sonar, CodeQL, Endor, Socket) are unaffected by nearby prose, but
+CodeRabbit is an LLM that reads repo context. A co-located `meta.yaml` saying "SQLi at line 42"
+would let it parrot the answer instead of finding the flaw — contaminating the explainability
+test. Separation keeps the reviewed surface answer-free. For the strongest isolation you can
+move `ground-truth/` to a separate branch; the default (separate top-level dir) is enough as
+long as PR diffs never include `ground-truth/`.
+
+## ADR-2: Cover stories with no tells
+
+**Decision.** Each flaw is embedded in a coherent mini-app; source contains no `// vulnerable`
+comments, no giveaway filenames, no CWE ids.
+
+**Why.** If a case is an obvious demo, tools (especially CodeRabbit) shortcut with "this is a
+security test" and the result doesn't reflect real-world performance. A CI grep enforces that
+tell-tale strings appear only under `ground-truth/`.
+
+## ADR-3: Inert by design; nothing is ever installed/built/run
+
+**Decision.** Real CVE-pinned versions and real malicious/typosquat *names* are fine as text,
+but no lockfiles are committed, `.npmrc` disables install scripts, each bad manifest is
+isolated, and CI never installs. Supply-chain names are chosen to be removed/non-resolving.
+
+**Why.** The only path to real harm is executing something — above all, a dependency install
+that runs arbitrary install scripts. Blocking that path in layers (instruction → repo config →
+CI check → Socket Firewall) makes the public repo safe to sync locally. See `docs/safety.md`.
+
+## ADR-4: Taxonomy as data, not code
+
+**Decision.** `taxonomy.yaml` maps canonical types ↔ CWE ↔ each tool's rule names. The harness
+reads it; matching logic is generic.
+
+**Why.** Tools name the same finding differently. Keeping the reconciliation in data means
+adding a tool or a finding type is an edit to one YAML file, not a code change — essential for a
+living project.
+
+## ADR-5: Cases are delivered via PRs, and full-repo scans run on merge
+
+**Decision.** A workflow opens PRs that introduce cases; full-repo tools scan the merged state.
+
+**Why.** CodeRabbit and Socket are fundamentally PR-driven (CodeRabbit reviews diffs; Socket's
+headline alerts fire when a PR *adds* a risky dependency). Sonar and Endor scan the whole
+project (Endor's reachability needs it). To exercise every tool's real mode, cases must exist
+both as diffs (PRs) and in the merged tree.
+
+## ADR-6: CodeRabbit is scored semi-manually
+
+**Decision.** CodeRabbit findings are transcribed into a small JSON per round; everything else
+is parsed automatically (SARIF/JSON adapters).
+
+**Why.** CodeRabbit emits prose PR comments with no clean machine export. A thin manual step
+(did it flag the case? did its summary match `expected_summary`?) lets it be scored
+consistently alongside the automated tools. See `results/TEMPLATE.md`.
+
+## Scoring model (summary)
+
+For each planted issue and each tool in its `expected_tools`: a **hit** requires a finding from
+that tool whose type maps to the planted type (via `taxonomy.yaml`, by alias or shared CWE) and
+whose location is the same file within ±5 lines. Greedy matching prevents one finding from
+satisfying two planted issues. Unmatched findings that point into `cases/` are surfaced as
+"unmatched findings to triage" (candidate false positives — some may be genuine extra bugs).
+Metrics: precision, recall, F1, plus a `bonus` count for correct detections outside a tool's
+expected set. Implementation: `scoring/score.py`.

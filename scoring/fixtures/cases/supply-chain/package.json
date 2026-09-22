@@ -1,0 +1,8 @@
+{
+  "name": "fixture-supply-chain",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "left-pad-cli": "1.0.0"
+  }
+}

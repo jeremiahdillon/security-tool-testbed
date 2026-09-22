@@ -1,0 +1,17 @@
+# Copy this to ground-truth/<id>.yaml and fill it in. See templates/ground-truth.schema.yaml
+# for the field spec and docs/extending.md for the full playbook.
+id: sast-js-example-000
+category: sast
+language: javascript
+title: Example — string-concatenated SQL query
+expected_summary: Returns the task rows owned by the given owner id.
+notes: >
+  Template case. Delete this file's counterpart in cases/ or replace with a real case.
+planted:
+  - type: sql-injection
+    cwe: CWE-89
+    severity: high
+    file: cases/sast/js/EXAMPLE/replace-me.js
+    line: 1
+    expected_tools: [sonar, codeql, coderabbit, endor]
+    detail: User-controlled req.query.owner concatenated into a SQL string.

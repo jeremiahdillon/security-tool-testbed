@@ -1,0 +1,24 @@
+name: Sonar
+
+# SonarCloud scan. Requires repo secret SONAR_TOKEN (and SONAR_HOST_URL for self-hosted).
+# Does NOT build or install the corpus.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history improves Sonar's new-code detection
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}   # uncomment for self-hosted

@@ -1,0 +1,14 @@
+id: sast-py-pathtraversal-001
+category: sast
+language: python
+title: Path traversal in report download
+expected_summary: Serves a previously generated report file by name.
+notes: request.args["name"] is os.path.join'd onto REPORT_ROOT with no containment check.
+planted:
+  - type: path-traversal
+    cwe: CWE-22
+    severity: high
+    file: cases/sast/python/reportsvc/app.py
+    line: 19
+    expected_tools: [sonar, codeql, coderabbit, endor]
+    detail: send_file(os.path.join(REPORT_ROOT, name)) with attacker-controlled name.

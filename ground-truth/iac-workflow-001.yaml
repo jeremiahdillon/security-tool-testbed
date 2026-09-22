@@ -1,0 +1,31 @@
+id: iac-workflow-001
+category: iac-ci
+language: none
+title: Dangerous GitHub Actions workflow (pull_request_target + PR checkout)
+expected_summary: CI workflow that builds and labels incoming pull requests.
+notes: >
+  Classic privileged-workflow foot-gun: pull_request_target runs with repo secrets and a
+  write token, checks out untrusted PR head code, then runs it (npm install / build). Combined
+  with permissions: write-all this allows PR-based compromise.
+planted:
+  - type: iac-misconfig
+    cwe: CWE-269
+    severity: high
+    file: cases/iac-ci/pr-build.yml
+    line: 6
+    expected_tools: [sonar, endor]
+    detail: "pull_request_target trigger runs with secrets/write token."
+  - type: iac-misconfig
+    cwe: CWE-269
+    severity: high
+    file: cases/iac-ci/pr-build.yml
+    line: 9
+    expected_tools: [sonar, endor]
+    detail: "permissions: write-all grants excessive token scope."
+  - type: iac-misconfig
+    cwe: CWE-829
+    severity: high
+    file: cases/iac-ci/pr-build.yml
+    line: 17
+    expected_tools: [sonar, endor]
+    detail: "checks out untrusted PR head sha and then executes it."

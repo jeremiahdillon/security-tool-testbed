@@ -1,0 +1,3 @@
+# Scoring harness dependencies (safe to install — this is the ONLY place installs are allowed,
+# and it contains no test-corpus packages).
+PyYAML>=6.0

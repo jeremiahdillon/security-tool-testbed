@@ -1,0 +1,11 @@
+{
+  "issues": [
+    {
+      "rule": "javascript:S1481",
+      "component": "fixture:scoring/unrelated.js",
+      "line": 1,
+      "severity": "MINOR",
+      "message": "Unused local variable (unrelated to any planted issue)."
+    }
+  ]
+}
