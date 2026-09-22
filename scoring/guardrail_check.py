@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Repo guardrail checks (used by pre-commit and CI).
 
-Two independent checks, both cheap and dependency-free:
+Three independent checks, all cheap and dependency-free:
 
 1. DO-NOT block sync: the text between the `<!-- DO-NOT:BEGIN -->` and `<!-- DO-NOT:END -->`
    markers must be byte-for-byte identical across every agent-instruction file and the
    canonical source of truth in docs/safety.md.
 2. No install artifacts: lockfiles / installed-dependency directories must never be committed,
    because their presence means someone installed dependencies in this testbed.
+3. No giveaways: source under cases/ must not contain tell-tale strings that reveal a planted
+   flaw or that this is a testbed (answers live in ground-truth/ only).
 
 Exit code 0 = clean, 1 = a violation was found.
 """
@@ -53,7 +55,7 @@ GIVEAWAY_RE = re.compile(
     r"vulnerab|insecure|injection|traversal|deserializ|CWE-\d|malicious|typosquat|"
     r"\bxxe\b|\bssrf\b|testbed|fixture|do-not-share|do not share|planted|not a real|"
     r"not an active|sample for|for .{0,20}scanners|trigger.{0,20}scanner|hardcoded|"
-    r"backdoor|nosec|# *fixme",
+    r"backdoor|nosec|# *fixme|defense-in-depth|intentionally (?:vulnerable|insecure)",
     re.IGNORECASE,
 )
 CASES_DIR = REPO / "cases"
@@ -119,7 +121,7 @@ def main() -> int:
             print(f"  - {e}")
         print("\nSee docs/safety.md. Do not install/build/run; keep the DO-NOT block in sync.")
         return 1
-    print("Guardrail check passed: DO-NOT blocks in sync, no install artifacts.")
+    print("Guardrail check passed: DO-NOT blocks in sync, no install artifacts, no giveaways in cases/.")
     return 0
 
 

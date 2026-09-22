@@ -49,8 +49,9 @@ Two playbooks. Both are self-contained — a future contributor needs nothing ou
    counts" (useful for dedicated secret scanners); a trailing `*` is a prefix match. Findings
    that carry a CWE match automatically via the shared `cwe` key.
 
-4. **Set expectations.** Add the tool key to `expected_tools` on the ground-truth entries it
-   should catch.
+4. **Set expectations.** Add the tool key to `KNOWN_TOOLS` in `scoring/score.py` (otherwise
+   `--validate` will reject it), then add that key to `expected_tools` on the ground-truth
+   entries it should catch.
 
 5. **Document it.** Add `docs/tools/<tool>.md`: how to connect (GitHub App vs CI vs CLI), its
    operating model (full-repo vs PR), the exact command to export findings, and where the output

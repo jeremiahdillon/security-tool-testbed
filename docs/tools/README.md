@@ -7,7 +7,7 @@ never counted as a "miss" against the tool). This table tracks what's wired up.
 
 | Tool key | Category | Adapter | Setup doc | Notes |
 |---|---|---|---|---|
-| `codeql` | SAST | ✅ SARIF | (built-in workflow) | Free baseline. Add `actions` to the matrix to cover the workflow case. |
+| `codeql` | SAST | ✅ SARIF | (built-in workflow) | Free baseline. GitHub Actions workflow analysis (the `actions` language) is a separate CodeQL capability that is **not enabled in `codeql.yml` by default**; the IaC-workflow case is primarily covered by Endor/Sonar. |
 | `sonar` | SAST + some SCA | ✅ `sonar` / SARIF | `sonar.md` | Needs `SONAR_TOKEN` + configured `sonar-project.properties`. |
 | `socket` | SCA + supply-chain | ✅ `socket` | `socket.md` | PR-driven; matched by package name. |
 | `endor` | SCA + SAST + secrets + IaC | ✅ `endor` | `endor.md` | Broadest coverage; reachability. |

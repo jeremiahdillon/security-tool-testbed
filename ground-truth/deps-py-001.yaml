@@ -7,6 +7,6 @@ notes: Real CVE-bearing versions (never installed).
 planted:
   - {type: vulnerable-dependency, cwe: CWE-1395, severity: medium, file: cases/dependencies/python/requirements.txt, line: 2, expected_tools: [socket, endor, sonar, dependabot], detail: "requests 2.19.1 (older CVEs)"}
   - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,   file: cases/dependencies/python/requirements.txt, line: 3, expected_tools: [socket, endor, sonar, dependabot], detail: "PyYAML 5.3.1 (arbitrary code exec via full_load, CVE-2020-14343)"}
-  - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,   file: cases/dependencies/python/requirements.txt, line: 4, expected_tools: [socket, endor, sonar, dependabot], detail: "Jinja2 2.10.1 (sandbox escape / ReDoS)"}
+  - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,   file: cases/dependencies/python/requirements.txt, line: 4, expected_tools: [socket, endor, sonar, dependabot], detail: "Jinja2 2.10.1 (ReDoS CVE-2020-28493; fixed 2.11.3)"}
   - {type: vulnerable-dependency, cwe: CWE-1395, severity: high,   file: cases/dependencies/python/requirements.txt, line: 5, expected_tools: [socket, endor, sonar, dependabot], detail: "Django 2.2.0 (multiple CVEs)"}
-  - {type: vulnerable-dependency, cwe: CWE-1395, severity: medium, file: cases/dependencies/python/requirements.txt, line: 6, expected_tools: [socket, endor, sonar, dependabot], detail: "urllib3 1.24.1 (CRLF / CVE-2019-11324)"}
+  - {type: vulnerable-dependency, cwe: CWE-1395, severity: medium, file: cases/dependencies/python/requirements.txt, line: 6, expected_tools: [socket, endor, sonar, dependabot], detail: "urllib3 1.24.1 (certificate-validation CVE-2019-11324, fixed 1.24.2; CRLF CVE-2020-26137, fixed 1.25.9)"}

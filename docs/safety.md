@@ -35,9 +35,11 @@ in one of the manifest directories, because package install scripts run arbitrar
 path is blocked in layers:
 
 1. **Instruction** — the DO-NOT block, in every agent-instruction file.
-2. **Repo config** — `.npmrc` sets `ignore-scripts=true`; no lockfiles are committed; each bad
-   manifest lives in its own isolated subdirectory (no root workspace links them, so a stray
-   root-level `npm install` cannot reach them).
+2. **Repo config** — an `.npmrc` with `ignore-scripts=true` sits in **every directory that has a
+   `package.json`** (not just the repo root — npm reads `.npmrc` from the project root where the
+   command runs, and does not inherit an ancestor's). Do not delete these per-directory
+   `.npmrc` files. No lockfiles are committed, and each bad manifest lives in its own isolated
+   subdirectory (no root workspace links them).
 3. **CI check** — a job fails the build if a lockfile or install artifact is committed.
 4. **Runtime net** — Socket Firewall (`sfw`), if installed locally, refuses a flagged package
    before download even if the layers above are bypassed.

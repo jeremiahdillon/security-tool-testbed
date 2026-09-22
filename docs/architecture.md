@@ -26,8 +26,9 @@ tell-tale strings appear only under `ground-truth/`.
 ## ADR-3: Inert by design; nothing is ever installed/built/run
 
 **Decision.** Real CVE-pinned versions and real malicious/typosquat *names* are fine as text,
-but no lockfiles are committed, `.npmrc` disables install scripts, each bad manifest is
-isolated, and CI never installs. Supply-chain names are chosen to be removed/non-resolving.
+but no lockfiles are committed, a per-directory `.npmrc` (in every dir with a `package.json`)
+disables install scripts, each bad manifest is isolated, and CI never installs. Supply-chain
+names are chosen to be removed/non-resolving.
 
 **Why.** The only path to real harm is executing something — above all, a dependency install
 that runs arbitrary install scripts. Blocking that path in layers (instruction → repo config →
@@ -62,10 +63,23 @@ consistently alongside the automated tools. See `results/TEMPLATE.md`.
 
 ## Scoring model (summary)
 
-For each planted issue and each tool in its `expected_tools`: a **hit** requires a finding from
-that tool whose type maps to the planted type (via `taxonomy.yaml`, by alias or shared CWE) and
-whose location is the same file within ±5 lines. Greedy matching prevents one finding from
-satisfying two planted issues. Unmatched findings that point into `cases/` are surfaced as
-"unmatched findings to triage" (candidate false positives — some may be genuine extra bugs).
-Metrics: precision, recall, F1, plus a `bonus` count for correct detections outside a tool's
-expected set. Implementation: `scoring/score.py`.
+For each planted issue and each tool in its `expected_tools`, a **hit** requires a finding from
+that tool whose **type matches** (via `taxonomy.yaml` alias, the taxonomy CWE, or the planted
+entry's own CWE — all CWE comparisons are normalized so `CWE-089` == `CWE-89`) **and** whose
+**location matches**:
+
+- **Code categories** (sast, secrets, code-review, iac-ci): same file, within ±`LINE_TOL`
+  (5) lines. A finding with no file never matches (prevents cross-case mis-attribution).
+- **Dependency categories** (dependencies, supply-chain, license): matched by **exact package
+  name** against the specific dependency declared on the planted line (so `crossenv` is not
+  confused with `cross-env`), with purls (`pkg:npm/name@ver`) parsed to the bare name. Tools
+  that instead report the manifest `file:line` fall back to location matching.
+
+**Greedy one-to-one** matching prevents a single finding from satisfying two planted issues.
+Unmatched findings that point into `cases/` are surfaced as "unmatched findings to triage"
+(candidate false positives — some may be genuine extra bugs; note that FP counting is scoped to
+`cases/` on purpose, so noise elsewhere is not penalized). Metrics: **precision** (n/a when a
+tool reported nothing scoreable — never a misleading 1.00), **recall**, **F1**, and a `bonus`
+count for correct detections outside a tool's expected set. **Explainability** (CodeRabbit) is
+scored separately: its per-case summary is compared against the case's `expected_summary`.
+Implementation: `scoring/score.py`.

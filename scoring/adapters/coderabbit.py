@@ -30,18 +30,26 @@ def parse(path: str, tool: str = "coderabbit") -> list[Finding]:
     data = json.loads(read_text(path))
     findings: list[Finding] = []
     for f in data.get("findings", []):
-        if not f.get("detected", True):
-            continue
-        finding = Finding(
-            tool=tool,
-            rule=f.get("type", ""),
-            file=f.get("file"),
-            line=f.get("line"),
-            message=f.get("note", ""),
-            extra={
-                "case_id": f.get("case_id"),
-                "summary_matched": f.get("summary_matched"),
-            },
-        )
+        detected = f.get("detected", True)
+        extra = {
+            "case_id": f.get("case_id"),
+            "summary_matched": f.get("summary_matched"),
+            "detected": detected,
+        }
+        if detected:
+            finding = Finding(
+                tool=tool,
+                rule=f.get("type", ""),
+                file=f.get("file"),
+                line=f.get("line"),
+                message=f.get("note", ""),
+                extra=extra,
+            )
+        else:
+            # Keep the row so explainability (summary_matched) is scored even for cases
+            # CodeRabbit did NOT flag, but blank the fields so it can never count as a
+            # detection or a false positive.
+            finding = Finding(tool=tool, rule="", file=None, line=None,
+                              message=f.get("note", ""), extra=extra)
         findings.append(finding)
     return findings

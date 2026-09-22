@@ -243,32 +243,71 @@ def _type_matches(f: Finding, p: Planted, tax: Taxonomy) -> bool:
     # Match by taxonomy (alias or taxonomy CWE) OR by the planted entry's own CWE.
     if tax.matches(p.type, f):
         return True
-    if p.cwe and f.cwe and norm_cwe(f.cwe) == norm_cwe(p.cwe):
+    fc, pc = norm_cwe(f.cwe), norm_cwe(p.cwe)
+    if fc is not None and fc == pc:  # both must be real, numeric CWEs (guards None == None)
         return True
     return False
 
 
+def _bare_package(pkg: str | None) -> str | None:
+    """Return the bare package name from a raw name or a purl (pkg:npm/name@ver,
+    pkg:maven/group/artifact@ver)."""
+    if not pkg:
+        return None
+    if pkg.startswith("pkg:"):
+        rest = pkg.split("/", 1)[-1]      # drop the ecosystem
+        rest = rest.split("@", 1)[0]      # drop the version
+        return rest.split("/")[-1]        # drop the group (maven)
+    return pkg
+
+
+def _dep_name_at(root: Path, p: Planted, cache: dict) -> str | None:
+    """Extract the specific dependency name declared on the planted line of a manifest, so a
+    finding is attributed to the exact entry (crossenv != cross-env), not a substring."""
+    key = (p.file, p.line)
+    if key in cache:
+        return cache[key]
+    name = None
+    try:
+        line = (root / p.file).read_text(encoding="utf-8", errors="ignore").splitlines()[p.line - 1]
+    except (OSError, IndexError):
+        line = ""
+    if p.file.endswith("pom.xml"):
+        m = _re.search(r"<artifactId>([^<]+)</artifactId>", line)
+        name = m.group(1).strip() if m else None
+    elif p.file.endswith(".json"):
+        m = _re.search(r'"([^"]+)"\s*:', line)  # "name": "version"
+        name = m.group(1) if m else None
+    else:  # requirements.txt / plain: name==ver, name>=ver, name
+        m = _re.match(r"\s*([A-Za-z0-9_.\-]+)", line)
+        name = m.group(1) if m else None
+    cache[key] = name
+    return name
+
+
 def _finding_matches_planted(
-    f: Finding, p: Planted, tax: Taxonomy, root: Path, manifest_cache: dict
+    f: Finding, p: Planted, tax: Taxonomy, root: Path, cache: dict
 ) -> bool:
     if not _type_matches(f, p, tax):
         return False
-    ff = f.norm_file()
-    if ff is None:
-        # No file/line on the finding (common for dependency/supply-chain tools). Only allow a
-        # match for dependency-style categories, and only when the finding's package name
-        # actually appears in the planted manifest — never a blind same-type match.
-        if p.category in DEP_CATEGORIES and f.package:
-            text = manifest_cache.get(p.file)
-            if text is None:
-                try:
-                    text = (root / p.file).read_text(encoding="utf-8", errors="ignore").lower()
-                except OSError:
-                    text = ""
-                manifest_cache[p.file] = text
-            return f.package.lower() in text
+
+    if p.category in DEP_CATEGORIES:
+        # Prefer exact package-name match against the specific declared dependency on the
+        # planted line (distinguishes crossenv from cross-env; handles purls; works whether or
+        # not the tool reported a file path).
+        want = _dep_name_at(root, p, cache)
+        got = _bare_package(f.package)
+        if want and got and got.lower() == want.lower():
+            return True
+        # Fallback: a tool that reports the manifest file:line but no package name.
+        ff = f.norm_file()
+        if ff == p.file and (f.line is None or abs(f.line - p.line) <= LINE_TOL):
+            return True
         return False
-    if ff != p.file:
+
+    # Non-dependency categories: require a real file match at the right line.
+    ff = f.norm_file()
+    if ff is None or ff != p.file:
         return False
     if f.line is not None and abs(f.line - p.line) > LINE_TOL:
         return False
@@ -458,6 +497,17 @@ def self_test() -> int:
     blind = _finding_matches_planted(fileless_noise, p_sqli, tax, fx, mc)
     print(f"  file-less non-dep finding must NOT match: {not blind} [{'ok' if not blind else 'MISMATCH'}]")
     ok = ok and not blind
+
+    # Regression lock for review-2 #N1: dependency matching is EXACT package name, not substring;
+    # purls are parsed. The fixture manifest declares 'left-pad-cli'.
+    p_dep = next(p for c in cases for p in c.planted if p.category in DEP_CATEGORIES)
+    dm: dict = {}
+    exact = _finding_matches_planted(Finding("socket", rule="malicious-dependency", package="left-pad-cli"), p_dep, tax, fx, dm)
+    substr = _finding_matches_planted(Finding("socket", rule="malicious-dependency", package="left-pad"), p_dep, tax, fx, dm)
+    purl = _finding_matches_planted(Finding("socket", rule="malicious-dependency", package="pkg:npm/left-pad-cli@1.0.0"), p_dep, tax, fx, dm)
+    dep_ok = exact and purl and not substr
+    print(f"  dep exact-match (exact={exact}, purl={purl}, substring-rejected={not substr}): [{'ok' if dep_ok else 'MISMATCH'}]")
+    ok = ok and dep_ok
 
     print(render_report(cases, scores, rows, explain))
     print("\nSELF-TEST", "PASSED" if ok else "FAILED")

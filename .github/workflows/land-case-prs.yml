@@ -47,6 +47,11 @@ jobs:
              [ -z "$(git ls-files "$CASE_PATH")" ]; then
             echo "::error::case_path '$CASE_PATH' is not tracked in the repo"; exit 1
           fi
+          # Reject symlinks (the target itself or any link inside a directory) so nothing
+          # outside the repo can be dereferenced into the sandbox copy.
+          if [ -L "$CASE_PATH" ] || [ -n "$(find "$CASE_PATH" -type l 2>/dev/null)" ]; then
+            echo "::error::case_path must not be or contain a symlink"; exit 1
+          fi
           slug=$(echo "$CASE_PATH" | tr '/.' '--')
           branch="review/${slug}-${GITHUB_RUN_ID}"
           git config user.name "testbed-bot"

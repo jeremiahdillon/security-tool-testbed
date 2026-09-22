@@ -25,23 +25,23 @@ jobs:
           python-version: "3.11"
 
       - name: Install harness deps
-        run: pip install -r scoring/requirements.txt
+        run: python3 -m pip install -r scoring/requirements.txt
 
       - name: Guardrail check (DO-NOT sync + no install artifacts + no giveaways in cases/)
-        run: python scoring/guardrail_check.py
+        run: python3 scoring/guardrail_check.py
 
       - name: Real-secret leak guard (planted fakes only; no real secrets)
-        run: python scoring/leak_check.py
+        run: python3 scoring/leak_check.py
 
       - name: Validate ground truth
-        run: python scoring/score.py --validate
+        run: python3 scoring/score.py --validate
 
       - name: Harness self-test
-        run: python scoring/score.py --self-test
+        run: python3 scoring/score.py --self-test
 
       - name: Score round (optional)
         if: ${{ github.event.inputs.round_dir != '' }}
-        run: python scoring/score.py --round "${{ github.event.inputs.round_dir }}"
+        run: python3 scoring/score.py --round "${{ github.event.inputs.round_dir }}"
 
       - name: Upload round report
         if: ${{ github.event.inputs.round_dir != '' }}
