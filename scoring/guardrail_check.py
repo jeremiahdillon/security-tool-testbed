@@ -35,10 +35,28 @@ FORBIDDEN_ARTIFACTS = {
     "npm-shrinkwrap.json",
     "pnpm-lock.yaml",
     "yarn.lock",
+    "bun.lockb",
     "poetry.lock",
     "Pipfile.lock",
+    "uv.lock",
+    "Gemfile.lock",
+    "composer.lock",
+    "Cargo.lock",
+    "go.sum",
 }
 FORBIDDEN_DIRS = {"node_modules", "__pycache__", ".venv", "venv", "target"}
+
+# "Tell" strings that must never appear in source under cases/ — they would let an LLM reviewer
+# (or a reader) infer the flaw or that this is a test, defeating ADR-2. Answers live in
+# ground-truth/ only. This is the single shared pattern (CI, pre-commit, and docs all point here).
+GIVEAWAY_RE = re.compile(
+    r"vulnerab|insecure|injection|traversal|deserializ|CWE-\d|malicious|typosquat|"
+    r"\bxxe\b|\bssrf\b|testbed|fixture|do-not-share|do not share|planted|not a real|"
+    r"not an active|sample for|for .{0,20}scanners|trigger.{0,20}scanner|hardcoded|"
+    r"backdoor|nosec|# *fixme",
+    re.IGNORECASE,
+)
+CASES_DIR = REPO / "cases"
 
 
 def extract_block(path: Path) -> str | None:
@@ -75,8 +93,26 @@ def check_artifacts() -> list[str]:
     return errors
 
 
+def check_giveaways() -> list[str]:
+    errors: list[str] = []
+    if not CASES_DIR.exists():
+        return errors
+    for path in CASES_DIR.rglob("*"):
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for i, line in enumerate(text.splitlines(), 1):
+            if GIVEAWAY_RE.search(line):
+                rel = path.relative_to(REPO)
+                errors.append(f"giveaway/tell in source: {rel}:{i}: {line.strip()[:80]}")
+    return errors
+
+
 def main() -> int:
-    errors = check_sync() + check_artifacts()
+    errors = check_sync() + check_artifacts() + check_giveaways()
     if errors:
         print("Guardrail check FAILED:")
         for e in errors:

@@ -31,8 +31,21 @@ jobs:
           NOTE: ${{ github.event.inputs.note }}
         run: |
           set -euo pipefail
+          # Containment: case_path must be a repo-tracked path under cases/ — never an
+          # arbitrary/absolute path (prevents copying e.g. ~/.ssh or /etc into a pushed branch).
+          case "$CASE_PATH" in
+            cases/*) : ;;
+            *) echo "::error::case_path must start with 'cases/'"; exit 1 ;;
+          esac
+          if printf '%s' "$CASE_PATH" | grep -q '\.\.'; then
+            echo "::error::case_path must not contain '..'"; exit 1
+          fi
           if [ ! -e "$CASE_PATH" ]; then
             echo "::error::case_path '$CASE_PATH' does not exist"; exit 1
+          fi
+          if ! git ls-files --error-unmatch "$CASE_PATH" >/dev/null 2>&1 && \
+             [ -z "$(git ls-files "$CASE_PATH")" ]; then
+            echo "::error::case_path '$CASE_PATH' is not tracked in the repo"; exit 1
           fi
           slug=$(echo "$CASE_PATH" | tr '/.' '--')
           branch="review/${slug}-${GITHUB_RUN_ID}"

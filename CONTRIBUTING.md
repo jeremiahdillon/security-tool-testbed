@@ -23,12 +23,13 @@ Follow the step-by-step playbooks in [`docs/extending.md`](docs/extending.md):
 ## Before you commit / open a PR
 
 ```bash
-python3 scoring/guardrail_check.py                       # DO-NOT sync + no install artifacts
-python3 scoring/leak_check.py                            # no REAL secret leaks (fakes only)
-python3 scoring/score.py --validate                      # ground-truth schema + file:line
-grep -rniE 'vulnerab|insecure|injection|CWE-' cases/     # must return nothing
-python3 scoring/score.py --self-test                     # harness still works
+python3 scoring/guardrail_check.py    # DO-NOT sync + no install artifacts + no giveaways in cases/
+python3 scoring/leak_check.py         # no REAL secret leaks (planted fakes only)
+python3 scoring/score.py --validate   # ground-truth schema + file:line + known tools
+python3 scoring/score.py --self-test  # harness still works
 ```
+(The no-giveaways scan now lives inside `guardrail_check.py` as the single shared check — no
+separate grep to keep in sync.)
 (Install the pre-commit hooks with `pre-commit install` to run the first two automatically.)
 
 ## Authoring supply-chain cases

@@ -4,8 +4,7 @@
       "type": "malware",
       "package": "left-pad-cli",
       "severity": "critical",
-      "file": "cases/supply-chain/package.json",
-      "description": "Package flagged as malware / typosquat (fixture)."
+      "description": "Package flagged as malware / typosquat (fixture). No file path on purpose to exercise package-name matching."
     }
   ]
 }

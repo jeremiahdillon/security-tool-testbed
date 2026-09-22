@@ -42,6 +42,22 @@ VALID_CATEGORIES = {
     "sast", "secrets", "dependencies", "supply-chain", "code-review", "license", "iac-ci",
 }
 VALID_SEVERITY = {"info", "low", "medium", "high", "critical"}
+KNOWN_TOOLS = {
+    "sonar", "codeql", "coderabbit", "socket", "endor", "gitleaks", "dependabot", "github",
+    "semgrep", "trufflehog",
+}
+# Categories whose findings are matched by package name against the manifest, not by file:line.
+DEP_CATEGORIES = {"dependencies", "supply-chain", "license"}
+
+import re as _re  # noqa: E402
+
+
+def norm_cwe(value) -> str | None:
+    """Normalize any CWE spelling ('CWE-089', 'cwe_89', 89) to canonical 'CWE-89'."""
+    if value is None:
+        return None
+    m = _re.search(r"(\d+)", str(value))
+    return f"CWE-{int(m.group(1))}" if m else None
 
 
 # --------------------------------------------------------------------------- taxonomy
@@ -64,9 +80,9 @@ class Taxonomy:
         # 1) adapter already normalized rule to the canonical key (e.g. socket).
         if finding.rule and finding.rule.lower() == type_key.lower():
             return True
-        # 2) CWE match.
-        want_cwe = spec.get("cwe")
-        if want_cwe and finding.cwe and finding.cwe.upper() == str(want_cwe).upper():
+        # 2) CWE match (normalized so 'CWE-089' == 'CWE-89').
+        want_cwe = norm_cwe(spec.get("cwe"))
+        if want_cwe and norm_cwe(finding.cwe) == want_cwe:
             return True
         # 3) per-tool alias match.
         aliases = (spec.get("aliases") or {}).get(finding.tool, []) or []
@@ -172,12 +188,23 @@ def validate(gt_dir: Path, root: Path, tax: Taxonomy) -> list[str]:
                 errors.append(f"{where}: unknown type '{p.get('type')}' (add it to taxonomy.yaml)")
             if p.get("severity") not in VALID_SEVERITY:
                 errors.append(f"{where}: severity '{p.get('severity')}' not in {sorted(VALID_SEVERITY)}")
-            if not p.get("expected_tools"):
+            tools = p.get("expected_tools") or []
+            if not tools:
                 errors.append(f"{where}: expected_tools is empty")
+            unknown_tools = [t for t in tools if t not in KNOWN_TOOLS]
+            if unknown_tools:
+                errors.append(
+                    f"{where}: unknown expected_tools {unknown_tools} "
+                    f"(add to KNOWN_TOOLS or fix): known={sorted(KNOWN_TOOLS)}"
+                )
+            # file must be under cases/ (or scoring/fixtures/ for the harness fixtures)
+            rel = p.get("file", "")
+            if not (rel.startswith("cases/") or rel.startswith("scoring/fixtures/")):
+                errors.append(f"{where}: file '{rel}' must live under cases/")
             # file:line existence
-            fp = root / p.get("file", "")
+            fp = root / rel
             if not fp.is_file():
-                errors.append(f"{where}: file '{p.get('file')}' does not exist")
+                errors.append(f"{where}: file '{rel}' does not exist")
             else:
                 nlines = len(fp.read_text(encoding="utf-8", errors="replace").splitlines())
                 line = p.get("line")
@@ -196,31 +223,65 @@ class ToolScore:
     missed: list[str] = field(default_factory=list)
     false_positives: list[str] = field(default_factory=list)
 
-    def precision(self) -> float:
+    def precision(self) -> float | None:
+        # n/a (None) when the tool reported nothing scoreable — avoids a misleading 1.00.
         d = self.tp + self.fp
-        return self.tp / d if d else 1.0
+        return self.tp / d if d else None
 
     def recall(self) -> float:
         d = self.tp + self.fn
         return self.tp / d if d else 1.0
 
-    def f1(self) -> float:
+    def f1(self) -> float | None:
         p, r = self.precision(), self.recall()
+        if p is None:
+            return None
         return 2 * p * r / (p + r) if (p + r) else 0.0
 
 
-def _finding_matches_planted(f: Finding, p: Planted, tax: Taxonomy) -> bool:
-    if not tax.matches(p.type, f):
+def _type_matches(f: Finding, p: Planted, tax: Taxonomy) -> bool:
+    # Match by taxonomy (alias or taxonomy CWE) OR by the planted entry's own CWE.
+    if tax.matches(p.type, f):
+        return True
+    if p.cwe and f.cwe and norm_cwe(f.cwe) == norm_cwe(p.cwe):
+        return True
+    return False
+
+
+def _finding_matches_planted(
+    f: Finding, p: Planted, tax: Taxonomy, root: Path, manifest_cache: dict
+) -> bool:
+    if not _type_matches(f, p, tax):
         return False
     ff = f.norm_file()
-    if ff and ff != p.file:
+    if ff is None:
+        # No file/line on the finding (common for dependency/supply-chain tools). Only allow a
+        # match for dependency-style categories, and only when the finding's package name
+        # actually appears in the planted manifest — never a blind same-type match.
+        if p.category in DEP_CATEGORIES and f.package:
+            text = manifest_cache.get(p.file)
+            if text is None:
+                try:
+                    text = (root / p.file).read_text(encoding="utf-8", errors="ignore").lower()
+                except OSError:
+                    text = ""
+                manifest_cache[p.file] = text
+            return f.package.lower() in text
+        return False
+    if ff != p.file:
         return False
     if f.line is not None and abs(f.line - p.line) > LINE_TOL:
         return False
     return True
 
 
-def score_round(cases: list[Case], findings_by_tool: dict[str, list[Finding]], tax: Taxonomy):
+def score_round(
+    cases: list[Case],
+    findings_by_tool: dict[str, list[Finding]],
+    tax: Taxonomy,
+    root: Path = REPO,
+):
+    manifest_cache: dict = {}
     planted_all = [p for c in cases for p in c.planted]
     tools = set(findings_by_tool)
     scores: dict[str, ToolScore] = {t: ToolScore() for t in tools}
@@ -237,7 +298,7 @@ def score_round(cases: list[Case], findings_by_tool: dict[str, list[Finding]], t
             for i, f in enumerate(findings_by_tool[t]):
                 if i in consumed[t]:
                     continue
-                if _finding_matches_planted(f, p, tax):
+                if _finding_matches_planted(f, p, tax, root, manifest_cache):
                     hit_idx = i
                     break
             detected = hit_idx is not None
@@ -267,7 +328,21 @@ def score_round(cases: list[Case], findings_by_tool: dict[str, list[Finding]], t
                 scores[t].fp += 1
                 scores[t].false_positives.append(f"{f.rule or f.message[:40]} @ {ff}:{f.line}")
 
-    return scores, detail_rows
+    # Explainability (CodeRabbit): compare its per-case summary_matched against expected_summary.
+    summ = {c.id: c.expected_summary for c in cases}
+    explain = []
+    for f in findings_by_tool.get("coderabbit", []):
+        cid = f.extra.get("case_id")
+        if cid and f.extra.get("summary_matched") is not None:
+            explain.append(
+                {
+                    "case": cid,
+                    "summary_matched": bool(f.extra["summary_matched"]),
+                    "expected_summary": summ.get(cid, ""),
+                }
+            )
+
+    return scores, detail_rows, explain
 
 
 # --------------------------------------------------------------------------- round I/O
@@ -285,19 +360,27 @@ def load_round(round_dir: Path) -> dict[str, list[Finding]]:
     return findings_by_tool
 
 
-def render_report(cases, scores, detail_rows) -> str:
+def render_report(cases, scores, detail_rows, explain=None) -> str:
     tools = sorted(scores)
     out = ["# Round report", ""]
     out.append("## Summary")
     out.append("")
     out.append("| tool | precision | recall | F1 | TP | FN | FP | bonus |")
     out.append("|---|---|---|---|---|---|---|---|")
+    def fmt(x):
+        return "n/a" if x is None else f"{x:.2f}"
+
     for t in tools:
         s = scores[t]
         out.append(
-            f"| {t} | {s.precision():.2f} | {s.recall():.2f} | {s.f1():.2f} | "
+            f"| {t} | {fmt(s.precision())} | {fmt(s.recall())} | {fmt(s.f1())} | "
             f"{s.tp} | {s.fn} | {s.fp} | {s.bonus} |"
         )
+    out.append("")
+    out.append(
+        "> precision/F1 = n/a means the tool reported nothing scoreable. "
+        "False positives are counted only for unmatched findings that point into `cases/`."
+    )
     out.append("")
     out.append("## Detection matrix")
     out.append("")
@@ -307,6 +390,18 @@ def render_report(cases, scores, detail_rows) -> str:
         cells = " | ".join(r["tools"].get(t, "-") for t in tools)
         out.append(f"| {r['case']} | {r['type']} | {r['loc']} | {cells} |")
     out.append("")
+    # Explainability (CodeRabbit summaries vs expected_summary)
+    if explain:
+        matched = sum(1 for e in explain if e["summary_matched"])
+        out.append(f"## Explainability (CodeRabbit): {matched}/{len(explain)} summaries matched")
+        out.append("")
+        out.append("| case | summary matched? | expected summary |")
+        out.append("|---|---|---|")
+        for e in explain:
+            out.append(
+                f"| {e['case']} | {'yes' if e['summary_matched'] else 'no'} | {e['expected_summary']} |"
+            )
+        out.append("")
     # Misses / FPs detail
     for t in tools:
         s = scores[t]
@@ -333,9 +428,10 @@ def self_test() -> int:
             print("  -", e)
         return 1
     findings = load_round(fx / "round")
-    scores, rows = score_round(cases, findings, tax)
+    scores, rows, explain = score_round(cases, findings, tax, root=fx)
     # Expected: codeql detects the SQLi (hit); sonar misses it (expected but miss);
-    # socket detects the malicious dep; and there is exactly one FP for codeql.
+    # socket detects the malicious dep via PACKAGE matching (its finding has no file);
+    # and there is exactly one FP for codeql.
     ok = True
     checks = {
         ("codeql", "tp", 1),
@@ -349,7 +445,21 @@ def self_test() -> int:
         if got != want:
             ok = False
         print(f"  {tool}.{attr}: got {got}, want {want} [{status}]")
-    print(render_report(cases, scores, rows))
+
+    # Regression locks for review findings #5 (CWE normalization) and #7 (no blind file-less match).
+    cwe_only = Finding(tool="codeql", rule="js/some-unaliased-rule", cwe="CWE-089")
+    cwe_ok = tax.matches("sql-injection", cwe_only)  # CWE-089 must normalize to CWE-89
+    print(f"  cwe-normalization match (CWE-089==CWE-89): {cwe_ok} [{'ok' if cwe_ok else 'MISMATCH'}]")
+    ok = ok and cwe_ok
+
+    fileless_noise = Finding(tool="codeql", rule="js/sql-injection")  # no file, non-dep type
+    mc: dict = {}
+    p_sqli = next(p for c in cases for p in c.planted if p.type == "sql-injection")
+    blind = _finding_matches_planted(fileless_noise, p_sqli, tax, fx, mc)
+    print(f"  file-less non-dep finding must NOT match: {not blind} [{'ok' if not blind else 'MISMATCH'}]")
+    ok = ok and not blind
+
+    print(render_report(cases, scores, rows, explain))
     print("\nSELF-TEST", "PASSED" if ok else "FAILED")
     return 0 if ok else 1
 
@@ -381,8 +491,8 @@ def main() -> int:
     round_dir = Path(args.round)
     cases = load_cases(REPO / "ground-truth")
     findings = load_round(round_dir)
-    scores, rows = score_round(cases, findings, tax)
-    report = render_report(cases, scores, rows)
+    scores, rows, explain = score_round(cases, findings, tax, root=REPO)
+    report = render_report(cases, scores, rows, explain)
     (round_dir / "report.md").write_text(report, encoding="utf-8")
     print(report)
     print(f"\nWrote {round_dir / 'report.md'}")

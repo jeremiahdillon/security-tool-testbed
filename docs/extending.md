@@ -24,9 +24,9 @@ Two playbooks. Both are self-contained — a future contributor needs nothing ou
 
 4. **Validate.**
    ```bash
-   python3 scoring/score.py --validate      # schema + file:line existence
-   python3 scoring/guardrail_check.py       # DO-NOT sync + no install artifacts
-   grep -rniE 'vulnerab|insecure|injection|CWE-' cases/   # must return nothing
+   python3 scoring/score.py --validate   # schema + file:line existence + known tools
+   python3 scoring/guardrail_check.py    # DO-NOT sync + no install artifacts + no giveaways
+   python3 scoring/leak_check.py         # no real secret leaked outside planted dirs
    ```
 
 5. **Land it.** Commit; for CodeRabbit/Socket coverage, introduce it via a PR (the

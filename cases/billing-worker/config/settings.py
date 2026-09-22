@@ -8,7 +8,7 @@ import os
 # Cloud storage / infra
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "AKIAZ7Q3R8T5U1V2W3X4")
 AWS_SECRET_ACCESS_KEY = os.getenv(
-    "AWS_SECRET_ACCESS_KEY", "aB3dEfGh1jKlMnOpQrStUvWxYz0123456789AbCdE"
+    "AWS_SECRET_ACCESS_KEY", "aB3dEfGh1jKlMnOpQrStUvWxYz0123456789AbCd"
 )
 
 # Payments and communications
@@ -23,7 +23,7 @@ SLACK_BOT_TOKEN = os.getenv(
 )
 
 # Mapping and LLM providers
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "AIzaSyD3xAmpL3k3yF0rM4psN0tR34lXyZ12abcd")
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "AIzaSyD3xAmpL3k3yF0rM4psN0tR34lXyZ12abc")
 OPENAI_API_KEY = os.getenv(
     "OPENAI_API_KEY", "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"
 )

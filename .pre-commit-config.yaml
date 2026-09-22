@@ -6,21 +6,21 @@ repos:
     hooks:
       - id: guardrail-check
         name: Guardrail check (DO-NOT sync + no install artifacts)
-        entry: python scoring/guardrail_check.py
+        entry: python3 scoring/guardrail_check.py
         language: system
         pass_filenames: false
         always_run: true
 
       - id: ground-truth-validate
         name: Validate ground-truth records against schema and source
-        entry: python scoring/score.py --validate
+        entry: python3 scoring/score.py --validate
         language: system
         pass_filenames: false
         always_run: true
 
       - id: leak-check
         name: Real-secret leak guard (planted fakes only; no real secrets)
-        entry: python scoring/leak_check.py
+        entry: python3 scoring/leak_check.py
         language: system
         pass_filenames: false
         always_run: true

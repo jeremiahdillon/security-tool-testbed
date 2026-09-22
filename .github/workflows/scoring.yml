@@ -27,18 +27,11 @@ jobs:
       - name: Install harness deps
         run: pip install -r scoring/requirements.txt
 
-      - name: Guardrail check (DO-NOT sync + no install artifacts)
+      - name: Guardrail check (DO-NOT sync + no install artifacts + no giveaways in cases/)
         run: python scoring/guardrail_check.py
 
       - name: Real-secret leak guard (planted fakes only; no real secrets)
         run: python scoring/leak_check.py
-
-      - name: No giveaways in source
-        run: |
-          if grep -rniE 'vulnerab|insecure|injection|traversal|deserializ|CWE-|malicious|typosquat|xxe|ssrf' cases/; then
-            echo "::error::Tell-tale strings found in cases/ — answers belong in ground-truth/ only."
-            exit 1
-          fi
 
       - name: Validate ground truth
         run: python scoring/score.py --validate

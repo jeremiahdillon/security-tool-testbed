@@ -8,7 +8,7 @@ module.exports = {
   },
   session: {
     // Used to sign session cookies.
-    secret: process.env.SESSION_SECRET || 'S3cr3t-t4skfl0w-signing-key-do-not-share',
+    secret: process.env.SESSION_SECRET || 'tf_9x2Qd7Lm4Rp8Wk1Zc6Vn3Bs5Hj0Yg2',
   },
   jwt: {
     issuer: 'taskflow',

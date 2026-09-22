@@ -1,12 +1,14 @@
 # Case template
 
-Copy this directory's siblings when authoring a new case. Two rules that make or break the
-testbed:
+This folder holds a copyable **ground-truth example** (`ground-truth.example.yaml`). There is no
+source example here on purpose — source lives under `cases/`, and this template folder must stay
+free of planted flaws.
 
-1. **The source you place under `cases/` must contain NO tells.** No comments like
-   `// vulnerable`, no filenames like `sql_injection.js`, no CWE ids. It must read like ordinary
-   application code so an LLM reviewer has to find the flaw on its own.
-2. **All answers go in `ground-truth/<id>.yaml`** (copy `ground-truth.example.yaml`), never
-   beside the code.
+To author a new case (full steps: [`../../docs/extending.md`](../../docs/extending.md) → "Add a case"):
 
-Steps: see `docs/extending.md` → "Add a case".
+1. Put realistic source under `cases/<category>/...` — embed the flaw in a coherent app.
+   **No tells**: no `// vulnerable` comments, no giveaway filenames, no CWE ids. (The
+   `guardrail_check.py` giveaway scan enforces this.)
+2. Copy `ground-truth.example.yaml` to `ground-truth/<id>.yaml` and fill it in against
+   `../ground-truth.schema.yaml`. `<id>` must equal the filename stem.
+3. Run: `python3 scoring/score.py --validate && python3 scoring/guardrail_check.py`.

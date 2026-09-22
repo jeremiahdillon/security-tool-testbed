@@ -6,14 +6,21 @@ package-lock.json
 npm-shrinkwrap.json
 pnpm-lock.yaml
 yarn.lock
+bun.lockb
 .pnp.*
 poetry.lock
 Pipfile.lock
+uv.lock
+Gemfile.lock
+composer.lock
+Cargo.lock
+go.sum
 .venv/
 venv/
 __pycache__/
 *.pyc
-target/          # Maven/Gradle build output
+# Maven/Gradle build output (comment on its own line — gitignore has no inline comments)
+target/
 build/
 .gradle/
 *.class

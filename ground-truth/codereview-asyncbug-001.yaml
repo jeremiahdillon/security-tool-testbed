@@ -4,9 +4,9 @@ language: javascript
 title: Missing await and swallowed errors in notifier
 expected_summary: Emails every task owner that their report is ready.
 notes: >
-  Two review-grade issues: fetchUser is async but not awaited (user is a Promise, user.email is
-  undefined), and forEach with an async body means results is returned before sends resolve. The
-  catch block also swallows errors silently. Targets CodeRabbit, not rule-based SAST.
+  Two review-grade issues: fetchUser() returns a Promise but is not awaited, so user.email is
+  undefined when passed to sendEmail; and the catch block swallows the error silently, so failed
+  notifications are reported as successes. Targets CodeRabbit, not rule-based SAST.
 planted:
   - type: logic-bug
     cwe: null

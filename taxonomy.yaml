@@ -80,6 +80,8 @@ types:
       endor: [SECRET, HARDCODED_SECRET]
       socket: []
       gitleaks: ["*"]        # any rule id from a dedicated secret scanner counts
+      github: ["*"]          # GitHub secret scanning (no adapter yet; see docs/tools/README.md)
+      trufflehog: ["*"]
 
   vulnerable-dependency:
     cwe: CWE-1395
@@ -106,7 +108,9 @@ types:
     cwe: CWE-732
     aliases:
       sonar: ["docker:*", "github-actions:*", "iac"]
-      codeql: [actions/*]
+      # CodeQL Actions analysis only runs if 'actions' is added to the codeql.yml language
+      # matrix (it is not, by default). Left here for when that is enabled.
+      codeql: ["actions/*"]
       endor: [IAC_MISCONFIG, CICD_MISCONFIG]
 
   logic-bug:

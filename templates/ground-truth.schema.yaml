@@ -3,8 +3,11 @@
 # enforces the required fields and that every planted `file`/`line` exists in the repo.
 
 # --- required top-level fields ---
-id: string            # unique, kebab-case, matches the ground-truth filename stem
-                      #   convention: <category>-<lang>-<short>-NNN  e.g. sast-js-sqli-001
+id: string            # unique, kebab-case, MUST match the ground-truth filename stem.
+                      #   Recommended (not enforced) shape: <area>-<short>-NNN, e.g.
+                      #   sast-js-sqli-001, deps-java-001, codereview-offbyone-001,
+                      #   supply-chain-001. The <area> prefix is a readable label, not required
+                      #   to equal the `category` field verbatim.
 category: enum        # one of: sast | secrets | dependencies | supply-chain |
                       #         code-review | license | iac-ci
 language: enum        # javascript | typescript | python | java | none

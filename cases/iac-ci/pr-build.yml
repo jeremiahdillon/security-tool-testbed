@@ -1,5 +1,3 @@
-# Example CI workflow for building and labeling pull requests.
-# (Stored under cases/ as a sample for IaC/CI scanners; it is NOT an active workflow.)
 name: PR Build
 
 on:

@@ -45,16 +45,20 @@ PATTERNS = {
     "twilio-apikey": re.compile(r"SK[0-9a-fA-F]{32}"),
     "private-key-block": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |)?PRIVATE KEY-----"),
     "azure-accountkey": re.compile(r"AccountKey=[A-Za-z0-9+/=]{20,}"),
+    # npm auth tokens can hide in any .npmrc — catch them by content, not filename.
+    "npm-token": re.compile(r"(?:_authToken|_password)\s*=\s*[A-Za-z0-9\-_/+=.]{16,}"),
+    "slack-webhook": re.compile(r"https://hooks\.slack\.com/services/[A-Za-z0-9/]{20,}"),
 }
 
 # Filenames that should never be committed to this repo (they'd carry real creds).
+# Note: .npmrc is NOT here — a bare .npmrc (ignore-scripts guard) is legitimate; a real token
+# inside one is caught by the 'npm-token' content pattern above.
 BAD_FILENAMES = re.compile(
     r"(^|/)(\.env(\..+)?|\.netrc|id_rsa|id_ed25519|id_dsa|.*\.pem|.*\.p12|.*\.pfx|"
-    r"credentials|\.npmrc)$",
+    r"credentials)$",
     re.IGNORECASE,
 )
-# Files that are allowed to match BAD_FILENAMES for legitimate reasons.
-FILENAME_ALLOWLIST = {".npmrc"}  # repo root .npmrc is our ignore-scripts guard, not a credential
+FILENAME_ALLOWLIST: set[str] = set()
 
 
 def tracked_files() -> list[str]:

@@ -43,8 +43,10 @@ def parse(path: str, tool: str = "socket") -> list[Finding]:
         findings.append(
             Finding(
                 tool=tool,
+                # Do NOT fabricate a path. When Socket reports no file, the scorer matches by
+                # package name against the manifest instead (see score.py DEP_CATEGORIES).
                 rule=rule,
-                file=a.get("file") or "package.json",
+                file=a.get("file"),
                 severity=a.get("severity"),
                 message=a.get("description", "") or a.get("title", ""),
                 package=a.get("package") or a.get("pkg") or a.get("purl"),

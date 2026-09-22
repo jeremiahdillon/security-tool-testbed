@@ -1,7 +1,8 @@
 name: Sonar
 
-# SonarCloud scan. Requires repo secret SONAR_TOKEN (and SONAR_HOST_URL for self-hosted).
-# Does NOT build or install the corpus.
+# SonarCloud scan. Requires repo secret SONAR_TOKEN and configured sonar-project.properties
+# (replace the CHANGE_ME_* placeholders). Does NOT build or install the corpus.
+# The job is skipped until SONAR_TOKEN is set, so it does not fail red out of the box.
 on:
   push:
     branches: [main]
@@ -9,15 +10,31 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 jobs:
   sonar:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
+      - name: Check for token
+        id: gate
+        run: |
+          if [ -z "${SONAR_TOKEN}" ]; then
+            echo "SONAR_TOKEN not set — skipping Sonar scan (configure it to enable)."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.enabled == 'true'
         with:
           fetch-depth: 0   # full history improves Sonar's new-code detection
 
       - name: SonarCloud Scan
+        if: steps.gate.outputs.enabled == 'true'
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

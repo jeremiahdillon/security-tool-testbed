@@ -12,3 +12,10 @@ planted:
     line: 14
     expected_tools: [sonar, codeql, coderabbit, endor]
     detail: req.params.name reaches exec() via an interpolated `convert` command.
+  - type: path-traversal
+    cwe: CWE-22
+    severity: high
+    file: cases/sast/js/taskflow/routes/attachments.js
+    line: 12
+    expected_tools: [sonar, codeql, endor]
+    detail: req.params.name flows into path.join(UPLOAD_DIR, name) with no containment check.
