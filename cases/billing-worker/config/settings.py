@@ -12,14 +12,14 @@ AWS_SECRET_ACCESS_KEY = os.getenv(
 )
 
 # Payments and communications
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_live_51JZx2eK7QrStUvWxYz0AbCdEfGh")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "sk_live_N7ITxKLUkX0vyOYx6tzSnWQ3")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "AC0a1b2c3d4e5f6071829304a5b6c7d8e9")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "f0e1d2c3b4a5968778695a4b3c2d1e0f")
 
 # Developer platform integrations
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8")
 SLACK_BOT_TOKEN = os.getenv(
-    "SLACK_BOT_TOKEN", "xoxb-2101234567890-2109876543210-AbCdEfGhIjKlMnOpQrStUvWx"
+    "SLACK_BOT_TOKEN", "xoxb-828638970835-495721780389-rLyba7ZR68pdIJ7h2Pz9rHJ6"
 )
 
 # Mapping and LLM providers
@@ -29,7 +29,7 @@ OPENAI_API_KEY = os.getenv(
 )
 ANTHROPIC_API_KEY = os.getenv(
     "ANTHROPIC_API_KEY",
-    "sk-ant-api03-Xy12Zk34Lm56No78Pq90Rs12Tu34Vw56Xy78Zk90Lm12No34Pq56-AbCdEf",
+    "sk-ant-api03-Un2ZiSZZNcTp6FvO6Hzifj0gczznKz5ObQ3DfNBxxg-6d_TGHiqhvOky4Ggt2Sf3Kth7SWiATHByr9Y2GuCQYy1u8PfdyAA",
 )
 OPENROUTER_API_KEY = os.getenv(
     "OPENROUTER_API_KEY",
