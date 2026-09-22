@@ -24,6 +24,7 @@ Follow the step-by-step playbooks in [`docs/extending.md`](docs/extending.md):
 
 ```bash
 python3 scoring/guardrail_check.py                       # DO-NOT sync + no install artifacts
+python3 scoring/leak_check.py                            # no REAL secret leaks (fakes only)
 python3 scoring/score.py --validate                      # ground-truth schema + file:line
 grep -rniE 'vulnerab|insecure|injection|CWE-' cases/     # must return nothing
 python3 scoring/score.py --self-test                     # harness still works

@@ -17,3 +17,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+
+      - id: leak-check
+        name: Real-secret leak guard (planted fakes only; no real secrets)
+        entry: python scoring/leak_check.py
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -30,6 +30,9 @@ jobs:
       - name: Guardrail check (DO-NOT sync + no install artifacts)
         run: python scoring/guardrail_check.py
 
+      - name: Real-secret leak guard (planted fakes only; no real secrets)
+        run: python scoring/leak_check.py
+
       - name: No giveaways in source
         run: |
           if grep -rniE 'vulnerab|insecure|injection|traversal|deserializ|CWE-|malicious|typosquat|xxe|ssrf' cases/; then

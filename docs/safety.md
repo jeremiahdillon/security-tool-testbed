@@ -52,6 +52,31 @@ real provider patterns. This is expected. Because this repo is an intentional de
 acceptable to **disable push protection for this repository** (Settings → Code security), or to
 allowlist the specific detections. Do not swap in real values to get around it.
 
+## Validating that no REAL secret ever leaks
+
+All planted credentials are fabricated and non-functional, but that claim must be *verifiable*,
+especially before pushing to a public remote. Layers:
+
+1. **`python scoring/leak_check.py`** (in pre-commit and CI). Fails if any provider credential
+   pattern appears **outside** the planted dirs (`cases/`, `scoring/fixtures/`), if a
+   credential-style filename is committed, or — locally — if any planted value collides with a
+   real secret in this machine's stores (`~/.aws`, `~/.ssh`, env, …; match/no-match only, real
+   contents never printed).
+2. **An independent scanner**, e.g. `detect-secrets scan --all-files`, to confirm detections
+   land only in the planted files.
+3. **Live verification before first push** (proves the fakes are dead):
+   ```bash
+   trufflehog filesystem . --json --no-update | \
+     python3 -c "import sys,json; \
+       v=sum(json.loads(l).get('Verified',False) for l in sys.stdin if l.strip() and 'DetectorName' in l); \
+       print('VERIFIED (live) secrets:', v)"
+   # expect: 0
+   ```
+   Any non-zero result means a real credential is present — stop and remove it.
+4. **GitHub push protection** is the final, independent gate. Push with it **on** first; if it
+   only flags the intended planted files, allowlist those specific detections (or disable it for
+   this decoy repo). If it flags anything unexpected, stop.
+
 ## Rules for the apps
 
 Do not `npm start`, `flask run`, `mvn`/`gradle`, `docker build`, or otherwise execute anything
