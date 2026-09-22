@@ -36,6 +36,7 @@ tools evolve.
 - **`scoring/`** — the harness (`score.py`) + per-tool adapters.
 - **`results/`** — dated results of each comparison round (the living log).
 - **`docs/`** — start here: [`architecture.md`](docs/architecture.md) (why),
+  [`onboarding.md`](docs/onboarding.md) (connect the tools — the runbook),
   [`methodology.md`](docs/methodology.md) (how to run a round),
   [`extending.md`](docs/extending.md) (add a case / add a tool),
   [`tools/`](docs/tools) (per-tool setup).
