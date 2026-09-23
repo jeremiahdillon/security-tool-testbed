@@ -7,12 +7,12 @@ never counted as a "miss" against the tool). This table tracks what's wired up.
 
 | Tool key | Category | Adapter | Setup doc | Notes |
 |---|---|---|---|---|
-| `codeql` | SAST | ✅ SARIF | (built-in workflow) | Free baseline for JS/TS, Python, Java. It is **not** configured to scan the Dockerfile or GitHub Actions workflow cases here — those IaC cases are covered by Sonar/Endor. |
-| `sonar` | SAST + some SCA | ✅ `sonar` / SARIF | `sonar.md` | Needs `SONAR_TOKEN` + configured `sonar-project.properties`. |
+| `codeql` | SAST | ✅ SARIF | (built-in workflow) | Free baseline for JS/TS, Python, Java. Not configured to scan the Dockerfile/Actions IaC cases here — those are covered by Sonar/Aikido. |
+| `sonar` | SAST + some SCA | ✅ `sonar` / SARIF | `sonar.md` | Automatic Analysis (no token) is the simplest mode; CI via `SONAR_TOKEN` optional. |
 | `socket` | SCA + supply-chain | ✅ `socket` | `socket.md` | PR-driven; matched by package name. |
-| `endor` | SCA + SAST + secrets + IaC | ✅ `endor` | `endor.md` | Broadest coverage; reachability. |
+| `endor` | SCA + SAST + secrets + IaC | ⚠️ `endor` (blocked) | `endor.md` | **Tenant-gated — no self-serve free tier.** Scanning needs a provisioned Endor tenant; the `agenthq` GitHub app is a separate read-only Copilot plugin, not the scanner. |
 | `coderabbit` | AI review | ✅ `coderabbit` (semi-manual) | `coderabbit.md` | Explainability graded via `summary_matched`. |
-| `gitar` | AI review (Sonar-owned) | ✅ `gitar` (semi-manual) | `gitar.md` | **14-day trial — connect last.** Same transcription shape as CodeRabbit. |
+| `gitar` | AI review (Sonar-owned) | ✅ `gitar` (semi-manual) | `gitar.md` | **~14-day trial.** ⚠️ Can auto-*fix* (write access) — never apply/merge its fixes (would patch fixtures). |
 | `aikido` | SAST + SCA + secrets + IaC | ✅ SARIF (`--tool aikido`) | `aikido.md` | Free tier; broad coverage. SAST matches by CWE; SCA/secret/IaC via `aikido` aliases. |
 | `gitleaks` | Secrets | ❌ planned | — | SARIF-capable; can be added via the sarif adapter with `tool: gitleaks`. |
 | `trufflehog` | Secrets | ❌ planned | — | Used already for pre-push verification (see `../safety.md`); JSON adapter TODO. |

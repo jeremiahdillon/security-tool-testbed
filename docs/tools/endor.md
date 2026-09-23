@@ -6,10 +6,18 @@ posture), run in CI on branches, plus PR checks. Reachability analysis needs the
 **Covers here:** the broadest surface — dependency CVEs (with reachability), supply-chain,
 SAST, secrets, license, and IaC/CI posture.
 
+> **Access note:** Endor Labs' scanning platform is **tenant-gated** — signing in without a
+> provisioned tenant yields "No authorized tenant found." There is no self-serve free tier for
+> repo scanning; you need a sales-provisioned trial or an org tenant to get scanning and an
+> `endorctl` API key. (Separately, the `endor-labs-github-agenthq` GitHub app is a *different*,
+> read-only Copilot/AgentHQ dependency-intelligence plugin — it does **not** scan the repo or
+> produce scoreable findings.)
+
 ## Connect
 
-Install the Endor Labs GitHub App, or run `endorctl` in CI with a namespace/API key. For SCA,
-Endor resolves dependencies from the manifests without installing them.
+Requires an Endor tenant (see access note). Then install the Endor Labs **scanning** GitHub App,
+or run `endorctl` in CI with your namespace/API key. For SCA, Endor resolves dependencies from
+the manifests without installing them.
 
 ## Export findings for a round
 

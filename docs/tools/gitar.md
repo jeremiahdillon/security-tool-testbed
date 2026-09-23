@@ -10,6 +10,12 @@ when they appear in a PR diff.
 > **Trial clock:** Gitar's free access is a ~14-day trial. Connect it **last**, only when the
 > repo is pushed, the corpus is final, and the other tools are already producing output — then
 > run a full round and capture Gitar's results within the window. See `docs/methodology.md`.
+>
+> **⚠️ Fixture hazard — do not apply Gitar's fixes.** Gitar doesn't just review; it can *fix*
+> the issues it finds (one-click, or a `Gitar fix` / `@gitar-bot fix` comment) and has
+> read+write access to code and workflows. Applying a fix or merging its fix commits would
+> **patch the planted vulnerabilities** and mutate the fixtures. Use only its review comments as
+> the detection/explainability signal; never invoke its fixes, and never merge a Gitar fix PR.
 
 ## Connect
 
