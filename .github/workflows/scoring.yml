@@ -45,11 +45,22 @@ jobs:
 
       - name: Score round (optional)
         if: ${{ github.event.inputs.round_dir != '' }}
-        run: python3 scoring/score.py --round "${{ github.event.inputs.round_dir }}"
+        # Pass the dispatch input via env, never interpolated into the shell, to avoid
+        # workflow script injection (flagged by Aikido). $ROUND_DIR is quoted below.
+        env:
+          ROUND_DIR: ${{ github.event.inputs.round_dir }}
+        run: |
+          case "$ROUND_DIR" in
+            results/*) : ;;
+            *) echo "::error::round_dir must be under results/"; exit 1 ;;
+          esac
+          python3 scoring/score.py --round "$ROUND_DIR"
 
       - name: Upload round report
         if: ${{ github.event.inputs.round_dir != '' }}
+        env:
+          ROUND_DIR: ${{ github.event.inputs.round_dir }}
         uses: actions/upload-artifact@v4
         with:
           name: round-report
-          path: ${{ github.event.inputs.round_dir }}/report.md
+          path: ${{ env.ROUND_DIR }}/report.md
