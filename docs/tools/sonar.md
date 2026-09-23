@@ -8,9 +8,12 @@ deserialization, XXE), hardcoded secrets, some dependency and IaC findings.
 
 ## Connect
 
-- SonarCloud: sign in with GitHub, import this repo (it's public), and add the project.
-- CI: the workflow `.github/workflows/sonar.yml` runs the scan. Set repo secret `SONAR_TOKEN`
-  (and `SONAR_HOST_URL` if self-hosted). Adjust `sonar-project.properties` if needed.
+- **Automatic Analysis (recommended):** sign in to SonarCloud with GitHub, install the app,
+  import this (public) repo, and pick *Automatic Analysis*. It scans on every push — no token,
+  no CI job. This is the mode in use.
+- **CI (optional):** the token-gated workflow `.github/workflows/sonar.yml` runs the scan when
+  repo secret `SONAR_TOKEN` is set; set `projectKey`/`organization` in `sonar-project.properties`
+  and turn Automatic Analysis off (the two can't both run).
 
 ## Export findings for a round
 

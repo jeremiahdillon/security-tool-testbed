@@ -94,15 +94,19 @@ Install the Aikido app (free tier). Broad coverage (SAST/SCA/secrets/IaC). Expor
 round: `{format: sarif, tool: aikido, path: aikido.sarif}`. Details:
 [`docs/tools/aikido.md`](tools/aikido.md).
 
-## 7. SonarCloud  (workflow + token)
+## 7. SonarCloud
 
-1. Sign in to SonarCloud with GitHub, import this (public) repo, note the **organization** and
-   **project key**.
-2. Add repo secret **`SONAR_TOKEN`** (Settings → Secrets and variables → Actions).
-3. Edit `sonar-project.properties` — replace `CHANGE_ME_org` and `CHANGE_ME_security-tool-testbed`
-   with the org/project key.
-4. The `.github/workflows/sonar.yml` job is token-gated; once `SONAR_TOKEN` exists it runs on
-   push/PR. Export issues for a round via the API (see [`docs/tools/sonar.md`](tools/sonar.md)).
+Two modes; pick one:
+
+- **Automatic Analysis (recommended, no token):** sign in to SonarCloud with GitHub, install the
+  SonarCloud app, import this (public) repo, and choose *Automatic Analysis*. It scans on every
+  push with no CI job or token. This is the mode this repo uses.
+- **CI-based (optional):** add repo secret **`SONAR_TOKEN`**, set `projectKey`/`organization` in
+  `sonar-project.properties`, and the token-gated `.github/workflows/sonar.yml` runs the scan.
+  Turn *Automatic Analysis* off in the project if you use this (the two can't both run).
+
+To pull Sonar's findings into a scoring round, export issues via the web API (a read-only user
+token) — see [`docs/tools/sonar.md`](tools/sonar.md).
 
 ## 8. Gitar  (GitHub App — TRIAL, connect LAST)
 
