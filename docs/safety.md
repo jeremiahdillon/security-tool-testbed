@@ -79,6 +79,13 @@ especially before pushing to a public remote. Layers:
    only flags the intended planted files, allowlist those specific detections (or disable it for
    this decoy repo). If it flags anything unexpected, stop.
 
+## Opsec (public repo)
+
+Keep the repo free of environment-specific details (local paths, usernames, hostnames, accounts,
+personal tooling, review process, tier/budget). Describe the testbed generically. See the
+"Opsec — keep it public-safe" section in `CONTRIBUTING.md` for the checklist and the pre-publish
+grep.
+
 ## Rules for the apps
 
 Do not `npm start`, `flask run`, `mvn`/`gradle`, `docker build`, or otherwise execute anything

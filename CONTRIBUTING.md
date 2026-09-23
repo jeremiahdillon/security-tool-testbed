@@ -32,6 +32,25 @@ python3 scoring/score.py --self-test  # harness still works
 separate grep to keep in sync.)
 (Install the pre-commit hooks with `pre-commit install` to run the first two automatically.)
 
+## Opsec — keep it public-safe
+
+This is a **public** repo. Keep it free of anything specific to a contributor's machine, accounts,
+or workflow — describe the *testbed*, never a person's setup:
+
+- **No local specifics:** no usernames, hostnames, home paths, or install layouts
+  (`/Users/...`, `/home/...`, `~/.npm-global/...`, SSH host aliases).
+- **No personal voice:** write neutral, general-audience docs. Avoid "you already run X",
+  "I'll commit this for you", "send me your token", etc.
+- **No private context:** don't name a contributor's own tooling stack as fact, their account/
+  org/project keys, their review/audit process, or budget/tier/trial constraints.
+- Tools *under evaluation* may be named generically (they're the subject of the testbed); a
+  contributor's own local stack should not be asserted.
+- **Before publishing, grep for leaks:**
+  ```bash
+  git grep -niE '/Users/|/home/|~/\.|npm-global|<your-handle>|<your-hostname>'
+  ```
+  and skim changed docs for first-person/second-person setup references.
+
 ## Keeping the CodeRabbit test clean
 
 A single PR that adds both a case (`cases/`) and its answer (`ground-truth/`) would let an LLM
