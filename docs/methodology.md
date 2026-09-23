@@ -6,7 +6,7 @@ time.
 
 ## Prerequisites
 
-- `sfw pip3 install -r scoring/requirements.txt` (PyYAML only).
+- `python3 -m pip install -r scoring/requirements.txt` (PyYAML only).
 - One or more tools connected (see `docs/tools/`). You can start with just CodeQL.
 
 ## Steps

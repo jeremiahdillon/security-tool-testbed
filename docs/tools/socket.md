@@ -26,7 +26,7 @@ cve → vulnerable) via `taxonomy.yaml`.
 
 - **Enforcement backstop.** If `sfw` is installed locally it blocks a flagged package *before*
   download, so even an accidental `npm install`/`pip install` in a bad-manifest dir is stopped.
-  In this environment, package installs must be run through `sfw` (e.g. `sfw pip3 install ...`).
+  Where it is in use, route package installs through it (e.g. `sfw pip3 install ...`).
 - **Optional, manual-only prevention test.** To test Socket's *prevention* layer (distinct from
   detection), deliberately attempt an install in a throwaway/quarantined copy of a
   supply-chain manifest behind `sfw` and confirm it refuses. Because `sfw` checks intel before

@@ -45,7 +45,7 @@ tools evolve.
 
 ```bash
 # 1. Harness deps (the ONLY place installs are allowed — no test-corpus packages here).
-sfw pip3 install -r scoring/requirements.txt      # use `sfw` if Socket Firewall is installed
+python3 -m pip install -r scoring/requirements.txt   # PyYAML only; the only installs this repo needs
 
 # 2. Prove the harness works (hermetic fixtures, no real tools needed).
 python3 scoring/score.py --self-test
