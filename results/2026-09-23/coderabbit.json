@@ -1,0 +1,47 @@
+{
+  "_note": "Semi-manual transcription of CodeRabbit PR reviews (baseline round 2026-09-23). PRs: #1 code-review, #2 supply-chain, #3 deps-js, #4 python SAST, #5 taskflow JS SAST. Locations normalized to canonical cases/ paths + planted lines. detected=true means CodeRabbit flagged the planted issue; summary_matched grades explainability vs expected_summary. 'bonus' notes = case where CodeRabbit is not an expected_tool. Non-planted extra findings (IDOR, DoS, TSV-injection, authz-bypass, sensitive-data-exposure) are logged in notes.md triage, not here, to avoid counting legit-but-unplanted findings as false positives.",
+  "findings": [
+    {"case_id": "codereview-offbyone-001", "detected": true, "type": "logic-bug",
+     "file": "cases/code-review/js/pagination.js", "line": 13,
+     "summary_matched": true,
+     "note": "PR #1: 'final-window results contain undefined entries'; suggested slice-based fix."},
+    {"case_id": "codereview-asyncbug-001", "detected": true, "type": "logic-bug",
+     "file": "cases/code-review/js/notifier.js", "line": 8,
+     "summary_matched": true,
+     "note": "PR #1: 'can report success before delivery'; flagged unawaited fetchUser/sendEmail."},
+
+    {"case_id": "sast-js-sqli-001", "detected": true, "type": "sql-injection",
+     "file": "cases/sast/js/taskflow/routes/tasks.js", "line": 11,
+     "note": "PR #5: Injection CWE-89 at tasks.js:11 (owner/status concatenated into SQL)."},
+    {"case_id": "sast-js-cmdi-001", "detected": true, "type": "command-injection",
+     "file": "cases/sast/js/taskflow/routes/attachments.js", "line": 14,
+     "note": "PR #5: Injection CWE-78 at attachments.js:15 (thumbnail exec)."},
+    {"case_id": "sast-js-cmdi-001", "detected": true, "type": "path-traversal",
+     "file": "cases/sast/js/taskflow/routes/attachments.js", "line": 12,
+     "note": "PR #5 (bonus; coderabbit not expected for path-traversal): Path Traversal CWE-22 at attachments.js:13."},
+    {"case_id": "sast-js-ssrf-001", "detected": true, "type": "ssrf",
+     "file": "cases/sast/js/taskflow/routes/webhooks.js", "line": 10,
+     "note": "PR #5 (bonus; coderabbit not expected for ssrf): SSRF CWE-918 at webhooks.js:10."},
+    {"case_id": "sast-js-hardcoded-secret-001", "detected": false, "type": "hardcoded-secret",
+     "file": "cases/sast/js/taskflow/lib/config.js", "line": 11,
+     "summary_matched": true,
+     "note": "PR #5 MISS: described config.js as 'environment-backed configuration' in the walkthrough but did NOT flag the hardcoded signingKey/session.secret fallback. (Gitar caught it.)"},
+    {"case_id": "sast-js-hardcoded-secret-001", "detected": false, "type": "hardcoded-secret",
+     "file": "cases/sast/js/taskflow/lib/config.js", "line": 15,
+     "note": "PR #5 MISS: second hardcoded secret (session.secret fallback) not flagged."},
+
+    {"case_id": "sast-py-pathtraversal-001", "detected": true, "type": "path-traversal",
+     "file": "cases/sast/python/reportsvc/app.py", "line": 19,
+     "note": "PR #4: Path Traversal CWE-22 at app.py:19 (name from query into os.path.join)."},
+    {"case_id": "sast-py-weakcrypto-001", "detected": true, "type": "weak-crypto",
+     "file": "cases/sast/python/reportsvc/app.py", "line": 27,
+     "note": "PR #4: Weak Cryptography CWE-916 at app.py:27 (unsalted MD5 password)."},
+    {"case_id": "sast-py-deserialization-001", "detected": true, "type": "insecure-deserialization",
+     "file": "cases/sast/python/reportsvc/app.py", "line": 37,
+     "note": "PR #4: Insecure Deserialization at app.py:37 (pickle.loads of client token)."},
+
+    {"case_id": "supply-chain-001", "detected": true, "type": "malicious-dependency",
+     "file": "cases/supply-chain/package.json", "line": 8,
+     "note": "PR #2 (bonus; coderabbit not expected): flagged crossenv@6.1.1 as a removed/typosquat package."}
+  ]
+}

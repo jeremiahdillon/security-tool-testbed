@@ -22,7 +22,7 @@ inputs:
   # - {format: socket, tool: socket, path: socket.json}
 
   # --- CodeRabbit (semi-manual; transcribe PR review into coderabbit.json) ---
-  # - {format: coderabbit, tool: coderabbit, path: coderabbit.json}
+  - {format: coderabbit, tool: coderabbit, path: coderabbit.json}
 
   # --- Gitar (semi-manual; transcribe PR review into gitar.json) ---
-  # - {format: gitar, tool: gitar, path: gitar.json}
+  - {format: gitar, tool: gitar, path: gitar.json}
