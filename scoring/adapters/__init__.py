@@ -8,17 +8,18 @@ Tool keys are free-form (sonar, codeql, semgrep, socket, endor, coderabbit, gitl
 """
 from __future__ import annotations
 
-from . import coderabbit, dependabot, endor, gitar, sarif, socket, sonar
+from . import aikido, coderabbit, dependabot, endor, gitar, sarif, socket, sonar
 from .common import Finding
 
 _FORMATS = {
-    "sarif": sarif.parse,     # also used for Aikido (SARIF export) via --tool aikido
+    "sarif": sarif.parse,     # CodeQL, and Aikido if a SARIF export is available (--tool aikido)
     "sonar": sonar.parse,
     "socket": socket.parse,
     "endor": endor.parse,
     "coderabbit": coderabbit.parse,
     "gitar": gitar.parse,
     "dependabot": dependabot.parse,
+    "aikido": aikido.parse,   # semi-manual dashboard transcription (free tier has no SARIF)
 }
 
 

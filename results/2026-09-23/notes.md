@@ -1,35 +1,54 @@
 # Round notes — 2026-09-23 (baseline)
 
-**Tools scored:** coderabbit, gitar (PR-driven); codeql, sonar, dependabot (full-repo)
-**Still to collect (manual dashboard export):** socket, aikido
+**Tools scored (all 7):** coderabbit, gitar (PR-driven); codeql, sonar, dependabot, socket,
+aikido (full-repo). Endor + GitHub secret scanning skipped this round.
 **Corpus commit:** `4300782eb14ab9d092c12a1d20f3907c3f571b64`
 
 This is the first scored round. The goal is a baseline scorecard: does each connected
 tool find the ~48 planted findings, and what does it report that isn't planted (FPs)?
 
-## Scorecard
+## Scorecard (complete)
 
 | tool | precision | recall | F1 | TP | FN | FP | bonus |
 |---|---|---|---|---|---|---|---|
 | gitar | 1.00 | 1.00 | 1.00 | 8 | 0 | 0 | 7 |
 | dependabot | 0.92 | 1.00 | 0.96 | 12 | 0 | 1 | 1 |
 | coderabbit | 1.00 | 0.78 | 0.88 | 7 | 2 | 0 | 3 |
+| socket | 1.00 | 0.75 | 0.86 | 12 | 4 | 0 | 0 |
 | codeql | 0.73 | 0.73 | 0.73 | 8 | 3 | 3 | 0 |
+| aikido | 1.00 | 0.57 | 0.72 | 26 | 20 | 0 | 0 |
 | sonar | 0.62 | 0.43 | 0.51 | 18 | 24 | 11 | 0 |
 
-Read recall *within each tool's remit*: dependabot/socket are SCA (deps only); codeql/sonar are
-SAST (+ some IaC/secrets); coderabbit/gitar are AI reviewers. A tool is only charged FN for a
-finding that lists it in `expected_tools`.
+Read recall *within each tool's remit* (a tool is only charged FN for a finding that lists it in
+`expected_tools`): dependabot/socket are SCA; codeql/sonar are SAST (+ some IaC/secrets); aikido
+spans SAST+SCA+secrets+IaC; coderabbit/gitar are AI reviewers.
 
-- **codeql** 8/11: caught all JS SAST + Python SAST; the 3 FN are Java (XXE, deserialization —
-  build-mode:none limits Java taint tracking) and it's not configured for IaC/secrets here. Its
-  3 FP are `js/missing-rate-limiting` (a real default query, not a planted vuln).
-- **sonar** 18/42 expected: strong on secrets (billing-worker matrix), JS/Python SAST, and
-  Docker IaC; misses = Java SAST (no compilation in Automatic Analysis), most SCA (not its
-  focus), and the GitHub Actions workflow case. FPs are duplicate detections on already-matched
-  lines + a "missing lock file" nag (S8564) that fires *because* we intentionally omit lockfiles.
-- **dependabot** 12/12 dep CVEs; 1 FP = mysql-connector's CVE flagged in the license case (real,
-  just off-topic for that case); event-stream = bonus.
+- **codeql** 8/11: all JS + Python SAST; 3 FN = Java (build-mode:none limits Java taint), not
+  configured for IaC/secrets. 3 FP = `js/missing-rate-limiting` (a real default query, not planted).
+- **sonar** 18/42: strong on the secrets matrix, JS/Python SAST, Docker IaC; misses = Java SAST
+  (no compilation in Automatic Analysis), most SCA, the Actions workflow case. FPs = duplicate
+  detections on matched lines + a "missing lock file" nag (S8564) that fires *because* we omit
+  lockfiles by design.
+- **dependabot** 12/12 dep CVEs; 1 FP = mysql-connector CVE in the license case (real, off-topic);
+  event-stream = bonus.
+- **socket** 12/16: every CVE dependency (JS/Py/Java). The 4 FN are the supply-chain typosquats +
+  license case: in the **free CSV export**, `event-stream` appears only as a CVE (not malware),
+  `loadsh` only as "deprecated", `crossenv` is absent from the SBOM (long-removed from npm), and
+  no GPL/license alert is emitted. So Socket's dependency-CVE coverage is excellent but its
+  supply-chain/malware and license signals weren't in the free export we had. 0 FP (CSV has no
+  file column, so its many transitive/off-topic CVEs don't map into `cases/`).
+- **aikido** 26/46: the broadest single tool — SAST (JS SQLi/cmdi/path-trav, Py + Java deser,
+  Java XXE), secrets (settings.py, appsettings.json, config.js), Docker IaC, and deps across all
+  three ecosystems + event-stream. 20 FN: JS SSRF, Python path-traversal + weak-crypto, the
+  pr-build.yml workflow case, license, crossenv/loadsh, gcp-service-account secret, 6 of 11
+  settings.py secrets, requests/Jinja2/urllib3. 0 scored FP.
+
+### Methodology note — FP counting for manual vs automated tools
+codeql/sonar/dependabot are scored mechanically (every unmatched finding in `cases/` is an FP).
+The **semi-manual** tools (coderabbit, gitar, aikido, and socket via CSV) are transcribed as
+detections-of-planted-issues; their *extra* real findings are recorded in the triage table below
+rather than as FPs (we can't mechanically separate real-extra-bug from noise in a hand
+transcription). This is why the manual tools show 0 FP — read their precision with that caveat.
 
 ### Harness changes made while scoring this round (committed)
 - Added **Sonar security-repo rule aliases** to `taxonomy.yaml` (`jssecurity:`/`pythonsecurity:`/
@@ -144,6 +163,11 @@ recording — they're real bugs, and candidates for promotion to new planted cas
 | gitar | index.js no-auth IDOR | real-extra-bug | consider new case `sast-js-idor` |
 | gitar | webhooks.js:10 missing request timeout | real-extra-bug | note; low priority |
 | gitar | app.py:43 users.tsv stored in public reports dir | real-extra-bug | consider new case |
+| aikido | scoring.yml template injection; sonar.yml 3rd-party action; land-case-prs.yml broad perms | real-extra-bug (our own workflows) | harden our workflows separately |
+| aikido | jackson-core, protobuf-java, commons-lang3, tar (transitive dep CVEs) | real-extra-bug | transitive; not planted |
+| aikido | index.js "Express not emitting security headers" | real-extra-bug | same no-auth surface as IDOR |
+| socket | ~150 extra CVEs across transitive deps (tar, jackson-core, protobuf, etc.) | real-extra-bug | transitive; no file column so not scored |
+| socket | mysql-connector CVE in license/pom.xml | real-extra-bug | off-topic for the license case |
 
 ## CodeRabbit / Gitar explainability
 | case | tool | summary_matched | note |

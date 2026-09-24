@@ -31,3 +31,9 @@ inputs:
 
   # --- Dependabot (full-repo; gh api dependabot/alerts, deduped per package+manifest) ---
   - {format: dependabot, tool: dependabot, path: dependabot.json}
+
+  # --- Socket (full-repo SBOM; converted from dashboard CSV export, deduped per package+type) ---
+  - {format: socket, tool: socket, path: socket.json}
+
+  # --- Aikido (semi-manual; transcribed from dashboard, free tier has no SARIF export) ---
+  - {format: aikido, tool: aikido, path: aikido.json}

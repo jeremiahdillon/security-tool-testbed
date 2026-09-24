@@ -1,0 +1,142 @@
+{
+ "alerts": [
+  {
+   "type": "cve",
+   "package": "pkg:maven/com.fasterxml.jackson.core/jackson-databind",
+   "severity": "critical",
+   "description": "Critical CVE: Polymorphic Typing issue in FasterXML jackson-databind in maven `com.fasterxml.jackson.core:jackson-databi"
+  },
+  {
+   "type": "cve",
+   "package": "event-stream",
+   "severity": "critical",
+   "description": "Critical CVE: Critical severity vulnerability that affects npm `event-stream` and flatmap-stream"
+  },
+  {
+   "type": "cve",
+   "package": "pyyaml",
+   "severity": "critical",
+   "description": "Critical CVE: Improper Input Validation in PyYAML"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/org.apache.logging.log4j/log4j-core",
+   "severity": "critical",
+   "description": "Critical CVE: Remote code injection in Log4j in maven `org.apache.logging.log4j:log4j-core`"
+  },
+  {
+   "type": "cve",
+   "package": "handlebars",
+   "severity": "critical",
+   "description": "Critical CVE: Prototype Pollution in npm `handlebars`"
+  },
+  {
+   "type": "cve",
+   "package": "django",
+   "severity": "critical",
+   "description": "Critical CVE: Django vulnerable to SQL injection via _connector keyword argument in QuerySet and Q objects."
+  },
+  {
+   "type": "cve",
+   "package": "minimist",
+   "severity": "critical",
+   "description": "Critical CVE: Prototype Pollution in npm `minimist`"
+  },
+  {
+   "type": "cve",
+   "package": "tar",
+   "severity": "critical",
+   "description": "Critical CVE: node-npm `tar`: Decompression/parse DoS via unlimited input"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/org.apache.commons/commons-text",
+   "severity": "critical",
+   "description": "Critical CVE: Arbitrary code execution in Apache Commons Text in maven `org.apache.commons:commons-text`"
+  },
+  {
+   "type": "cve",
+   "package": "axios",
+   "severity": "high",
+   "description": "High CVE: npm `axios` Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Mer"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/com.google.protobuf/protobuf-java",
+   "severity": "high",
+   "description": "High CVE: protobuf-java has potential Denial of Service issue in maven `com.google.protobuf:protobuf-java`"
+  },
+  {
+   "type": "cve",
+   "package": "urllib3",
+   "severity": "high",
+   "description": "High CVE: `Cookie` HTTP header isn't stripped on cross-origin redirects in pypi `urllib3`"
+  },
+  {
+   "type": "cve",
+   "package": "lodash",
+   "severity": "high",
+   "description": "High CVE: npm `lodash` vulnerable to Code Injection via `_.template` imports key names"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/com.fasterxml.jackson.core/jackson-core",
+   "severity": "high",
+   "description": "High CVE: jackson-core: Async parser maxNumberLength bypass via chunked digit accumulation (incomplete fix for GHSA-72hv"
+  },
+  {
+   "type": "cve",
+   "package": "requests",
+   "severity": "high",
+   "description": "High CVE: Insufficiently Protected Credentials in Requests"
+  },
+  {
+   "type": "malware",
+   "package": "pkg:maven/org.apache.commons/commons-lang3",
+   "severity": "high",
+   "description": "Obfuscated code: maven `org.apache.commons:commons-lang3` is 90.0% likely obfuscated"
+  },
+  {
+   "type": "malware",
+   "package": "pkg:maven/org.apache.logging.log4j/log4j-core",
+   "severity": "high",
+   "description": "Obfuscated code: maven `org.apache.logging.log4j:log4j-core` is 90.0% likely obfuscated"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/mysql/mysql-connector-java",
+   "severity": "high",
+   "description": "High CVE: MySQL Connectors takeover vulnerability in maven `mysql:mysql-connector-java`"
+  },
+  {
+   "type": "malware",
+   "package": "pkg:maven/org.apache.commons/commons-text",
+   "severity": "high",
+   "description": "Obfuscated code: maven `org.apache.commons:commons-text` is 90.0% likely obfuscated"
+  },
+  {
+   "type": "malware",
+   "package": "pkg:maven/org.apache.logging.log4j/log4j-api",
+   "severity": "high",
+   "description": "Obfuscated code: maven `org.apache.logging.log4j:log4j-api` is 90.0% likely obfuscated"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/org.apache.logging.log4j/log4j-api",
+   "severity": "medium",
+   "description": "Medium CVE: Apache Log4j API: Improper encoding of non-finite floating-point values during MapMessage JSON serialization"
+  },
+  {
+   "type": "cve",
+   "package": "pkg:maven/org.apache.commons/commons-lang3",
+   "severity": "medium",
+   "description": "Medium CVE: Apache Commons Lang is vulnerable to Uncontrolled Recursion when processing long inputs in maven `org.apache"
+  },
+  {
+   "type": "cve",
+   "package": "jinja2",
+   "severity": "medium",
+   "description": "Medium CVE: Jinja has a sandbox breakout through indirect reference to format method in pypi `jinja2`"
+  }
+ ]
+}

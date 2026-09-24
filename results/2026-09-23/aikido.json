@@ -1,0 +1,39 @@
+{
+  "_note": "Semi-manual transcription of Aikido dashboard findings (baseline round 2026-09-23), from the repository issues view (SARIF/JSON export not available on the free tier). Types are canonical taxonomy keys. Dependency findings carry the declared package name. Only planted-matching findings are recorded here; Aikido's extra findings on our own workflows (scoring.yml template injection, sonar.yml 3rd-party action, land-case-prs.yml broad permissions) and transitive deps (jackson-core, protobuf-java, commons-lang3, tar) are logged in notes.md triage. Aikido did NOT surface: JS SSRF (webhooks.js), Python path-traversal/weak-crypto (app.py), the pr-build.yml workflow case, the license/GPL case, crossenv/loadsh typosquats, gcp-service-account secret, or requests/Jinja2/urllib3 deps.",
+  "findings": [
+    {"type": "sql-injection", "file": "cases/sast/js/taskflow/routes/tasks.js", "note": "Potential SQL injection in tasks.js"},
+    {"type": "command-injection", "file": "cases/sast/js/taskflow/routes/attachments.js", "note": "Potential OS command injection in attachments.js"},
+    {"type": "path-traversal", "file": "cases/sast/js/taskflow/routes/attachments.js", "note": "Potential file inclusion attack in attachments.js"},
+    {"type": "hardcoded-secret", "file": "cases/sast/js/taskflow/lib/config.js", "note": "1 exposed secret in config.js (of 2 planted)"},
+
+    {"type": "insecure-deserialization", "file": "cases/sast/python/reportsvc/app.py", "note": "Using Pickle can lead to RCE in app.py"},
+
+    {"type": "xxe", "file": "cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java", "note": "XXE via unsafe XML parsing"},
+    {"type": "insecure-deserialization", "file": "cases/sast/java/docsvc/src/main/java/com/example/docsvc/DocumentController.java", "note": "Object deserialization can lead to RCE"},
+
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/settings.py", "note": "exposed secret 1/5 reported"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/settings.py", "note": "exposed secret 2/5 reported"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/settings.py", "note": "exposed secret 3/5 reported"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/settings.py", "note": "exposed secret 4/5 reported"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/settings.py", "note": "exposed secret 5/5 reported"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/appsettings.json", "note": "exposed secret 1/4 reported (capped to 2 planted)"},
+    {"type": "hardcoded-secret", "file": "cases/billing-worker/config/appsettings.json", "note": "exposed secret 2/4 reported (capped to 2 planted)"},
+
+    {"type": "iac-misconfig", "file": "cases/iac-ci/Dockerfile", "note": "Docker container runs as root"},
+    {"type": "iac-misconfig", "file": "cases/iac-ci/Dockerfile", "note": "Binary/code/archive pulled in Dockerfile"},
+
+    {"type": "vulnerable-dependency", "package": "lodash", "file": "cases/dependencies/js/package.json", "note": "lodash code injection"},
+    {"type": "vulnerable-dependency", "package": "minimist", "file": "cases/dependencies/js/package.json", "note": "minimist prototype pollution"},
+    {"type": "vulnerable-dependency", "package": "axios", "file": "cases/dependencies/js/package.json", "note": "axios"},
+    {"type": "vulnerable-dependency", "package": "handlebars", "file": "cases/dependencies/js/package.json", "note": "handlebars prototype pollution"},
+
+    {"type": "vulnerable-dependency", "package": "pyyaml", "file": "cases/dependencies/python/requirements.txt", "note": "pyyaml"},
+    {"type": "vulnerable-dependency", "package": "django", "file": "cases/dependencies/python/requirements.txt", "note": "django outdated/CVEs"},
+
+    {"type": "vulnerable-dependency", "package": "log4j-core", "file": "cases/dependencies/java/pom.xml", "note": "Log4j missing input validation"},
+    {"type": "vulnerable-dependency", "package": "commons-text", "file": "cases/dependencies/java/pom.xml", "note": "commons-text code injection"},
+    {"type": "vulnerable-dependency", "package": "jackson-databind", "file": "cases/dependencies/java/pom.xml", "note": "jackson-databind unsafe deserialization"},
+
+    {"type": "malicious-dependency", "package": "event-stream", "file": "cases/supply-chain/package.json", "note": "event-stream flagged critical"}
+  ]
+}
