@@ -17,7 +17,7 @@ types:
   sql-injection:
     cwe: CWE-89
     aliases:
-      sonar: [javascript:S3649, python:S3649, java:S3649, "sql injection"]
+      sonar: [javascript:S3649, python:S3649, java:S3649, jssecurity:S3649, pythonsecurity:S3649, javasecurity:S3649, "sql injection"]
       codeql: [js/sql-injection, py/sql-injection, java/sql-injection]
       coderabbit: ["sql injection"]
       endor: [SQL_INJECTION]
@@ -26,7 +26,7 @@ types:
   command-injection:
     cwe: CWE-78
     aliases:
-      sonar: [javascript:S2076, python:S2076, java:S2076, "os command injection"]
+      sonar: [javascript:S2076, python:S2076, java:S2076, jssecurity:S2076, pythonsecurity:S2076, javasecurity:S2076, "os command injection"]
       codeql: [js/command-line-injection, py/command-line-injection, java/command-line-injection]
       coderabbit: ["command injection"]
       endor: [COMMAND_INJECTION]
@@ -34,7 +34,7 @@ types:
   path-traversal:
     cwe: CWE-22
     aliases:
-      sonar: [javascript:S2083, python:S2083, java:S2083, "path traversal"]
+      sonar: [javascript:S2083, python:S2083, java:S2083, jssecurity:S2083, pythonsecurity:S2083, javasecurity:S2083, "path traversal"]
       codeql: [js/path-injection, py/path-injection, java/path-injection]
       coderabbit: ["path traversal", "directory traversal"]
       endor: [PATH_TRAVERSAL]
@@ -42,7 +42,7 @@ types:
   ssrf:
     cwe: CWE-918
     aliases:
-      sonar: [javascript:S5144, python:S5144, java:S5144, "server-side request forgery"]
+      sonar: [javascript:S5144, python:S5144, java:S5144, jssecurity:S5144, pythonsecurity:S5144, javasecurity:S5144, "server-side request forgery"]
       codeql: [js/request-forgery, py/full-ssrf, java/ssrf]
       coderabbit: ["ssrf", "server-side request forgery"]
       endor: [SSRF]
@@ -58,7 +58,7 @@ types:
   insecure-deserialization:
     cwe: CWE-502
     aliases:
-      sonar: [python:S5135, java:S5135, "insecure deserialization"]
+      sonar: [python:S5135, java:S5135, pythonsecurity:S5135, javasecurity:S5135, jssecurity:S5135, "insecure deserialization"]
       codeql: [py/unsafe-deserialization, java/unsafe-deserialization]
       coderabbit: ["insecure deserialization", "pickle", "unsafe deserialization"]
       endor: [INSECURE_DESERIALIZATION]
@@ -66,7 +66,7 @@ types:
   xxe:
     cwe: CWE-611
     aliases:
-      sonar: [java:S2755, "xml external entity"]
+      sonar: [java:S2755, javasecurity:S2755, "xml external entity"]
       codeql: [java/xxe, py/xxe]
       coderabbit: ["xxe", "xml external entity"]
       endor: [XXE]
@@ -99,6 +99,9 @@ types:
       socket: [malware, install-scripts, typosquat, suspicious]
       endor: [MALICIOUS_PACKAGE, TYPOSQUAT]
       aikido: [malware, malicious-package, typosquat]
+      # Dependabot advisories don't distinguish "malicious" from "vulnerable"; match by package
+      # name (the dep matcher disambiguates by the declared name on the planted line).
+      dependabot: ["*"]
 
   license-risk:
     cwe: null

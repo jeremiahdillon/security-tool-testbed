@@ -9,11 +9,13 @@
 #  and GitHub secret scanning are skipped for now.)
 
 inputs:
-  # --- SAST (full-repo, SARIF) ---
-  # - {format: sarif,  tool: codeql, path: codeql.sarif}
+  # --- CodeQL SAST (full-repo, SARIF; one analysis per language, from code-scanning API) ---
+  - {format: sarif,  tool: codeql, path: codeql-js.sarif}
+  - {format: sarif,  tool: codeql, path: codeql-py.sarif}
+  - {format: sarif,  tool: codeql, path: codeql-java.sarif}
 
-  # --- Sonar (Automatic Analysis; export issues via API to sonar.json) ---
-  # - {format: sonar,  tool: sonar,  path: sonar.json}
+  # --- Sonar (Automatic Analysis; api/issues/search JSON, public project, no token) ---
+  - {format: sonar,  tool: sonar,  path: sonar.json}
 
   # --- Aikido (export SARIF; matched by CWE/alias) ---
   # - {format: sarif,  tool: aikido, path: aikido.sarif}
@@ -26,3 +28,6 @@ inputs:
 
   # --- Gitar (semi-manual; transcribe PR review into gitar.json) ---
   - {format: gitar, tool: gitar, path: gitar.json}
+
+  # --- Dependabot (full-repo; gh api dependabot/alerts, deduped per package+manifest) ---
+  - {format: dependabot, tool: dependabot, path: dependabot.json}

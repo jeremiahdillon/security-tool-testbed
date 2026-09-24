@@ -1,18 +1,44 @@
 # Round notes — 2026-09-23 (baseline)
 
-**Tools scored so far (PR-driven):** coderabbit, gitar
-**Full-repo tools (deferred to next collection step):** codeql, sonar, socket, aikido, dependabot
+**Tools scored:** coderabbit, gitar (PR-driven); codeql, sonar, dependabot (full-repo)
+**Still to collect (manual dashboard export):** socket, aikido
 **Corpus commit:** `4300782eb14ab9d092c12a1d20f3907c3f571b64`
 
 This is the first scored round. The goal is a baseline scorecard: does each connected
 tool find the ~48 planted findings, and what does it report that isn't planted (FPs)?
 
-## Scorecard — PR-driven subset (coderabbit, gitar)
+## Scorecard
 
 | tool | precision | recall | F1 | TP | FN | FP | bonus |
 |---|---|---|---|---|---|---|---|
 | gitar | 1.00 | 1.00 | 1.00 | 8 | 0 | 0 | 7 |
+| dependabot | 0.92 | 1.00 | 0.96 | 12 | 0 | 1 | 1 |
 | coderabbit | 1.00 | 0.78 | 0.88 | 7 | 2 | 0 | 3 |
+| codeql | 0.73 | 0.73 | 0.73 | 8 | 3 | 3 | 0 |
+| sonar | 0.62 | 0.43 | 0.51 | 18 | 24 | 11 | 0 |
+
+Read recall *within each tool's remit*: dependabot/socket are SCA (deps only); codeql/sonar are
+SAST (+ some IaC/secrets); coderabbit/gitar are AI reviewers. A tool is only charged FN for a
+finding that lists it in `expected_tools`.
+
+- **codeql** 8/11: caught all JS SAST + Python SAST; the 3 FN are Java (XXE, deserialization —
+  build-mode:none limits Java taint tracking) and it's not configured for IaC/secrets here. Its
+  3 FP are `js/missing-rate-limiting` (a real default query, not a planted vuln).
+- **sonar** 18/42 expected: strong on secrets (billing-worker matrix), JS/Python SAST, and
+  Docker IaC; misses = Java SAST (no compilation in Automatic Analysis), most SCA (not its
+  focus), and the GitHub Actions workflow case. FPs are duplicate detections on already-matched
+  lines + a "missing lock file" nag (S8564) that fires *because* we intentionally omit lockfiles.
+- **dependabot** 12/12 dep CVEs; 1 FP = mysql-connector's CVE flagged in the license case (real,
+  just off-topic for that case); event-stream = bonus.
+
+### Harness changes made while scoring this round (committed)
+- Added **Sonar security-repo rule aliases** to `taxonomy.yaml` (`jssecurity:`/`pythonsecurity:`/
+  `javasecurity:` — Sonar files security findings under a different rule repo than the quality
+  rules we'd mapped). This converted ~5 Sonar SAST detections from miss+FP to TP.
+- Added a **Dependabot adapter** (`scoring/adapters/dependabot.py`): parses the alerts API JSON,
+  dedupes to one finding per package+manifest, rewrites Maven `group:artifact` to a purl so the
+  matcher reduces it to the artifactId. Added `dependabot: ["*"]` alias to malicious-dependency.
+- Fixed `load_round` to tolerate an all-commented `inputs.yaml`.
 
 - **Gitar** detected its full expected surface: both code-review logic bugs + all 6 JS SAST
   planted findings (SQLi, cmd-injection, path-traversal, SSRF, 2× hardcoded-secret). 7 bonus =

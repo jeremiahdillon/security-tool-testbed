@@ -17,6 +17,6 @@ never counted as a "miss" against the tool). This table tracks what's wired up.
 | `gitleaks` | Secrets | ❌ planned | — | SARIF-capable; can be added via the sarif adapter with `tool: gitleaks`. |
 | `trufflehog` | Secrets | ❌ planned | — | Used already for pre-push verification (see `../safety.md`); JSON adapter TODO. |
 | `github` | Secrets (GitHub secret scanning) | ❌ planned | — | Alerts via API; no adapter yet. |
-| `dependabot` | SCA | ❌ planned | — | Alerts via API; no adapter yet. |
+| `dependabot` | SCA | ✅ `dependabot` | — | Alerts via `gh api --paginate .../dependabot/alerts`; adapter dedupes per package+manifest and purl-normalizes Maven names. Alerts only (no auto-updates). |
 
 To add any of the ❌ tools, follow Playbook B in [`../extending.md`](../extending.md).
