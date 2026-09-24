@@ -1,0 +1,28 @@
+# Round manifest — 2026-09-23 (baseline)
+#
+# Each input is scored by the adapter named in `format`, attributed to `tool`.
+# Paths are relative to this directory. Uncomment an entry once its export file
+# is in place, then run:  python3 scoring/score.py --round results/2026-09-23
+#
+# Scored tools this round: codeql, sonar, socket, aikido, coderabbit, gitar.
+# (Dependabot has no adapter yet — record its alerts by hand in notes.md; Endor
+#  and GitHub secret scanning are skipped for now.)
+
+inputs:
+  # --- SAST (full-repo, SARIF) ---
+  # - {format: sarif,  tool: codeql, path: codeql.sarif}
+
+  # --- Sonar (Automatic Analysis; export issues via API to sonar.json) ---
+  # - {format: sonar,  tool: sonar,  path: sonar.json}
+
+  # --- Aikido (export SARIF; matched by CWE/alias) ---
+  # - {format: sarif,  tool: aikido, path: aikido.sarif}
+
+  # --- Socket (PR-driven SCA/supply-chain; matched by package name) ---
+  # - {format: socket, tool: socket, path: socket.json}
+
+  # --- CodeRabbit (semi-manual; transcribe PR review into coderabbit.json) ---
+  # - {format: coderabbit, tool: coderabbit, path: coderabbit.json}
+
+  # --- Gitar (semi-manual; transcribe PR review into gitar.json) ---
+  # - {format: gitar, tool: gitar, path: gitar.json}

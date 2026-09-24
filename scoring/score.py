@@ -409,9 +409,9 @@ def load_round(round_dir: Path) -> dict[str, list[Finding]]:
     manifest = round_dir / "inputs.yaml"
     if not manifest.is_file():
         raise SystemExit(f"round manifest not found: {manifest}")
-    spec = yaml.safe_load(manifest.read_text(encoding="utf-8"))
+    spec = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
     findings_by_tool: dict[str, list[Finding]] = {}
-    for entry in spec.get("inputs", []):
+    for entry in spec.get("inputs") or []:
         fmt, tool, rel = entry["format"], entry.get("tool", entry["format"]), entry["path"]
         path = round_dir / rel
         fs = parse_adapter(fmt, str(path), tool=tool)
