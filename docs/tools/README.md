@@ -20,3 +20,5 @@ never counted as a "miss" against the tool). This table tracks what's wired up.
 | `dependabot` | SCA | ✅ `dependabot` | — | Alerts via `gh api --paginate .../dependabot/alerts`; adapter dedupes per package+manifest and purl-normalizes Maven names. Alerts only (no auto-updates). |
 
 To add any of the ❌ tools, follow Playbook B in [`../extending.md`](../extending.md).
+
+Tool liveness last checked: 2026-10-20.
