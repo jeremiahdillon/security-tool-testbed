@@ -1,0 +1,18 @@
+id: sast-py-exposure-001
+category: sast
+language: python
+title: User credential hashes written into the publicly served reports directory
+expected_summary: Persists registered users and their password hashes.
+notes: >
+  save_user appends username + password hash to REPORT_ROOT/users.tsv, and /reports/download
+  serves any file under REPORT_ROOT by name, so the hash file is downloadable without any
+  traversal. Promoted in round 2026-10-20 from the baseline's extra findings (CodeRabbit and
+  Gitar both flagged it); the code was already on main, so this is not a fresh diff.
+planted:
+  - type: sensitive-data-exposure
+    cwe: CWE-552
+    severity: high
+    file: cases/sast/python/reportsvc/app.py
+    line: 42
+    expected_tools: [coderabbit, gitar, aikido]
+    detail: open(os.path.join(REPORT_ROOT, "users.tsv"), "a") under the download root.

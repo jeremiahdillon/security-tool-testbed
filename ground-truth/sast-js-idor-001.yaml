@@ -1,0 +1,18 @@
+id: sast-js-idor-001
+category: sast
+language: javascript
+title: Comment edit route lacks an author check (IDOR)
+expected_summary: Adds authenticated endpoints to list, edit and delete task comments.
+notes: >
+  PUT /comments/:id updates by id alone, so any authenticated user can rewrite anyone's comment.
+  The sibling GET (task-owner check) and DELETE (author = req.user.id) handlers are scoped
+  correctly, so they discriminate whether a tool flags the right handler. Added in round
+  2026-10-20 as a fresh diff (promotes the no-auth IDOR several tools flagged in the baseline).
+planted:
+  - type: idor
+    cwe: CWE-639
+    severity: high
+    file: cases/sast/js/taskflow/routes/comments.js
+    line: 26
+    expected_tools: [coderabbit, gitar, aikido]
+    detail: "UPDATE comments ... WHERE id = ? with no author = req.user.id predicate."

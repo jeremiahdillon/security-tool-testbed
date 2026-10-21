@@ -120,6 +120,22 @@ types:
       endor: [IAC_MISCONFIG, CICD_MISCONFIG]
       aikido: [iac, dockerfile, "cicd", misconfiguration]
 
+  idor:
+    # Insecure direct object reference / missing ownership check on an object id.
+    cwe: CWE-639
+    aliases:
+      coderabbit: ["idor", "insecure direct object reference", "missing authorization", "authorization bypass"]
+      gitar: ["idor", "insecure direct object reference", "missing authorization", "authorization bypass"]
+      aikido: ["idor", "broken access control", "missing authorization"]
+      endor: [IDOR, BROKEN_ACCESS_CONTROL]
+
+  sensitive-data-exposure:
+    cwe: CWE-552
+    aliases:
+      coderabbit: ["sensitive data exposure", "information exposure", "publicly accessible file"]
+      gitar: ["sensitive data exposure", "information exposure", "publicly accessible file"]
+      aikido: ["sensitive data exposure", "information exposure"]
+
   logic-bug:
     # Not a security class — used for CodeRabbit code-review scenarios (off-by-one, missing
     # await, swallowed errors). Rule-based SAST tools are not expected to catch these.

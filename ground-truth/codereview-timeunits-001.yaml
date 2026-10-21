@@ -1,0 +1,17 @@
+id: codereview-timeunits-001
+category: code-review
+language: javascript
+title: Seconds vs milliseconds in dueJobs
+expected_summary: Orders, batches and selects due reminder jobs.
+notes: >
+  dueAt is documented as Unix seconds but dueJobs defaults `now` to Date.now() (milliseconds),
+  so every job compares as due immediately. orderJobs and toBatches are correct controls.
+  A rule-based SAST tool is not expected to catch this.
+planted:
+  - type: logic-bug
+    cwe: null
+    severity: medium
+    file: cases/code-review/js/scheduler.js
+    line: 19
+    expected_tools: [coderabbit, gitar]
+    detail: "now = Date.now() is ms; compare against Math.floor(Date.now() / 1000)."
